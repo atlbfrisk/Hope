@@ -1,1 +1,98 @@
-фаил удален
+local TweenService = game:GetService("TweenService")
+
+local ScreenGui = Instance.new("ScreenGui")
+local main = Instance.new("Frame")
+local title = Instance.new("TextLabel")
+local idiot = Instance.new("TextLabel")
+local whiteScreen = Instance.new("Frame")
+
+ScreenGui.Parent = game.CoreGui
+
+-- Создание и настройка фрейма main
+main.Name = "main"
+main.Parent = ScreenGui
+main.BackgroundColor3 = Color3.new(0, 0, 0)
+main.BorderSizePixel = 0
+main.Position = UDim2.new(0, 0, 0, -24)
+main.Size = UDim2.new(1, 0, 0, 0)
+main.Visible = true
+
+-- Создание и настройка текста "sj spam"
+title.Name = "title"
+title.Parent = main
+title.BackgroundColor3 = Color3.new(0, 0, 0)
+title.Size = UDim2.new(0, 0, 0, 0)
+title.Font = Enum.Font.Arial
+title.Text = "sj spam"
+title.TextColor3 = Color3.new(139,0, 0)
+title.Position = UDim2.new(0.45, 0, 0.3, 0)
+title.TextTransparency = 1
+title.BackgroundTransparency = 1
+title.TextSize = 100
+
+-- Анимация фрейма main
+local tween = TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 1, 0) })
+tween:Play()
+
+wait(3)
+
+-- Анимация текста ""
+tween = TweenService:Create(title, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+tween:Play()
+
+-- Задержка перед появлением текста "
+wait(3)
+
+-- Создание и настройка текста ""
+idiot.Name = "my"
+idiot.Parent = main
+idiot.BackgroundColor3 = Color3.new(0, 0, 0)
+idiot.Size = UDim2.new(0, 0, 0, 0)
+idiot.Font = Enum.Font.Arial
+idiot.Text = "my"
+idiot.TextColor3 = Color3.new(255,0, 0)
+idiot.Position = UDim2.new(0.45, 0, 0.5, 0)
+idiot.TextTransparency = 1
+idiot.BackgroundTransparency = 1
+idiot.TextSize = 50
+
+-- Анимация текста ""
+tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+tween:Play()
+
+wait(4)
+
+-- Создание и настройка белого экрана
+whiteScreen.Name = "whiteScreen"
+whiteScreen.Parent = main
+whiteScreen.BackgroundColor3 = Color3.new(1, 1, 1)
+whiteScreen.BorderSizePixel = 0
+whiteScreen.Position = UDim2.new(0, 0, 0, 0)
+whiteScreen.Size = UDim2.new(1, 0, 1, 0)
+whiteScreen.Visible = false
+
+-- Показ белого экрана
+whiteScreen.Visible = true
+
+wait(1)
+
+-- Искажение текстов
+for _, textLabel in pairs(workspace:GetDescendants():GetChildren()) do
+    if textLabel:IsA("TextLabel") then
+        local originalText = textLabel.Text
+        local distortedText = ""
+
+        for i = 1, #originalText do
+            local char = originalText:sub(i, i)
+            local distortion = math.random(-0.2, 0.2)
+            distortedText = distortedText .. string.char(char:byte() + distortion)
+        end
+
+        textLabel.Text = distortedText
+    end
+end
+
+-- Уничтожение текстов и белого экрана одновременно
+title:Destroy()
+idiot:Destroy()
+whiteScreen:Destroy()
