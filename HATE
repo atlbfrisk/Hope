@@ -1,0 +1,102 @@
+local mouse = game.Players.LocalPlayer:GetMouse()
+local lastClickTime = 0
+local isClicking = false
+local wdm = false -- Переменная для отслеживания, включен ли режим
+
+mouse.Button1Down:Connect(function()
+    isClicking = true
+end)
+
+mouse.Button1Up:Connect(function()
+    if isClicking and (os.time() - lastClickTime) > 15 and wdm == true then
+        -- Выполнять действия при нажатии и удержании в течение более 15 секунд
+        game.Players:Chat(("act : destroy the system"))
+        lastClickTime = os.time()
+    end
+    isClicking = false
+end)
+
+local HealthTextLabel = game.Players.LocalPlayer.Character.Head.Display.Frame.Health.TextLabel
+local Sound = Instance.new("Sound")
+Sound.Parent = game.Players.LocalPlayer.Backpack
+Sound.Volume = 0.9
+Sound.Looped = false
+Sound.SoundId = "rbxassetid://6233759084" -- Звуковой ID целевой песни
+Sound.Name = "kill_you"
+Sound.PlaybackSpeed = 1
+local hasPlayed = false
+
+HealthTextLabel.Changed:Connect(function()
+    local HealthValue = tonumber(HealthTextLabel.Text:match("^(%d+)"))
+    if HealthValue and HealthValue <= 100 and not hasPlayed and wdm == true then
+        Sound.Playing = true
+        hasPlayed = true
+    end
+end)
+
+mouse.KeyDown:Connect(function(k)
+    if k == "z" then
+        wdm = true -- Включить режим
+
+        -- Выполнять действия при нажатии клавиши "z"
+        game.Players:Chat(("..."))
+        wait(4)
+        game.Players:Chat(("Ahhh... I don't want to do this "))
+        wait(4)
+        game.Players:Chat(("I'm sorry, bro"))
+        wait(4)
+        game.Players:Chat(("..."))
+        wait(4)
+        game.Players:Chat((" I HATE YOU " ))
+        wait(0.1)
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Backpack
+        Sound.Volume = 1.9
+        Sound.Playing = true
+        Sound.Looped = false
+        Sound.SoundId = "rbxassetid://6233759084"
+        Sound.Name = "lets_go"
+        Sound.PlaybackSpeed = 0.9
+        wait(0.5)
+        nsk = Instance.new("Sky", game.Lighting)
+        nsk.SkyboxBk = "rbxassetid://14071196"
+        nsk.SkyboxDn = "rbxassetid://14071196"
+        nsk.SkyboxFt = "rbxassetid://14071196"
+        nsk.SkyboxLf = "rbxassetid://14071196"
+        nsk.SkyboxRt = "rbxassetid://14071196"
+        nsk.SkyboxUp = "rbxassetid://14071196"
+        wait(0.5)
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Backpack
+        Sound.Volume = 0.9
+        Sound.Playing = true
+        Sound.Looped = true
+        Sound.SoundId = "rbxassetid://1837853076"
+        Sound.Name = "kill_you"
+        Sound.PlaybackSpeed = 1
+        game.Players:Chat((""))
+        wait (0.1)
+        game.Players.LocalPlayer.Character.Data.TimeMulti.Value = 1.8
+        wait(0.1)
+        -- Made By InfinityMercury
+        _G.Size = 20
+        _G.Disabled = true
+
+        game:GetService('RunService').RenderStepped:connect(function()
+            if _G.Disabled then
+                for i,v in next, game:GetService('Players'):GetPlayers() do
+                    if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+                        pcall(function()
+                            v.Character.HumanoidRootPart.Size = Vector3.new(_G.Size,_G.Size,_G.Size)
+                            v.Character.HumanoidRootPart.Transparency = 0.7
+                            v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really red")
+                            v.Character.HumanoidRootPart.Material = "Neon"
+                            v.Character.HumanoidRootPart.CanCollide = false
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+end)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/advxzivhsjjdhxhsidifvsh/mobkeyboard/main/main.txt", true))()
