@@ -173,10 +173,22 @@ if dead == true then
     main:Destroy()
     hell:Destroy()
     title:Destroy()
+    
     local Anim = Instance.new("Animation")
     Anim.AnimationId = "rbxassetid://13624084239"
     local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
     k:Play()
     k:AdjustSpeed(1)
+    local Sound = Instance.new("Sound")
+    Sound.Parent = game.Players.LocalPlayer.Character.Head
+    Sound.Volume = 150
+    Sound.Playing = true
+    Sound.Looped = false
+    Sound.SoundId = "rbxassetid://642336941"
+    Sound.Name = "text"
+    Sound.PlaybackSpeed = 1 
+    wait(0.1)
+    Sound:Destroy()
 
 end
+
