@@ -52,7 +52,7 @@ if dead == true then
     idiot.BackgroundColor3 = Color3.new(0, 0, 0)
     idiot.Size = UDim2.new(0, 0, 0, 0)
     idiot.Font = Enum.Font.Arial
-    idiot.Text = " IDIOT "
+    idiot.Text = "[ IDIOT ]"
     idiot.TextColor3 = Color3.new(255, 0, 0)
     idiot.Position = UDim2.new(0.45, 0, 0.5, 0)
     idiot.TextTransparency = 1
@@ -63,7 +63,7 @@ if dead == true then
     tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
     tween:Play()
 
-    wait(6)
+    wait(5.1)
 
     -- Создание и настройка белого экрана
     whiteScreen.Name = "whiteScreen"
@@ -81,29 +81,49 @@ if dead == true then
     idiot:Destroy()
     whiteScreen.BackgroundTransparency = 1
     title.Text = "S"
-    wait(0.35)
+    wait(0.25)
+    local Sound = Instance.new("Sound")
+    Sound.Parent = game.Players.LocalPlayer.Character.Head
+    Sound.Volume = 150
+    Sound.Playing = true
+    Sound.Looped = false
+    Sound.SoundId = "rbxassetid://9113128037"
+    Sound.Name = "text"
+    Sound.PlaybackSpeed = 1
     title.Text = "SY"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYS"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYST"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTE"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM R"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM RE"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM REB"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM REBO"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM REBOO"
-    wait(0.35)
+    Sound.Playing = true
+    wait(0.25)
     title.Text = "SYSTEM REBOOT"
-
+    Sound.Playing = true
+    wait(0.1) 
+    Sound:Destroy()
     -- Создание и настройка метки hell
     hell.Name = "hell"
     hell.Parent = main
@@ -143,12 +163,20 @@ if dead == true then
     whiteScreen.BackgroundColor3 = Color3.new(1, 1, 0)
     tween = TweenService:Create(whiteScreen, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {BackgroundTransparency = 0 })
     tween:Play()
+    local Anim = Instance.new("Animation")
+    Anim.AnimationId = "rbxassetid://13045731482"
+    local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+    k:Play()
+    k:AdjustSpeed(1.45)
     wait(3)
     whiteScreen:Destroy()
     main:Destroy()
     hell:Destroy()
     title:Destroy()
+    local Anim = Instance.new("Animation")
+    Anim.AnimationId = "rbxassetid://13624084239"
+    local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+    k:Play()
+    k:AdjustSpeed(1)
 
 end
-
-
