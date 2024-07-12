@@ -1,7 +1,6 @@
 local dead = true
 if dead == true then
     local TweenService = game:GetService("TweenService")
-
     local ScreenGui = Instance.new("ScreenGui")
     local main = Instance.new("Frame")
     local title = Instance.new("TextLabel")
@@ -74,8 +73,6 @@ if dead == true then
     whiteScreen.Position = UDim2.new(0, 0, 0, 0)
     whiteScreen.Size = UDim2.new(1, 0, 1, 0)
     whiteScreen.Visible = false
-
-    -- Показ белого экрана
     whiteScreen.Visible = true
 
     wait(2)
