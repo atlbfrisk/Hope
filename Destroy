@@ -1,1 +1,155 @@
-ты ведь это видел ? да sj
+local dead = true
+if dead == true then
+    local TweenService = game:GetService("TweenService")
+
+    local ScreenGui = Instance.new("ScreenGui")
+    local main = Instance.new("Frame")
+    local title = Instance.new("TextLabel")
+    local idiot = Instance.new("TextLabel")
+    local whiteScreen = Instance.new("Frame")
+    local hell = Instance.new("TextLabel")
+    ScreenGui.Parent = game.CoreGui
+
+    -- Создание и настройка фрейма main
+    main.Name = "main"
+    main.Parent = ScreenGui
+    main.BackgroundColor3 = Color3.new(0, 0, 0)
+    main.BorderSizePixel = 0
+    main.Position = UDim2.new(0, 0, 0, -24)
+    main.Size = UDim2.new(1, 0, 0, 0)
+    main.Visible = true
+
+    -- Создание и настройка текста "YOU'RE DAED"
+    title.Name = "title"
+    title.Parent = main
+    title.BackgroundColor3 = Color3.new(0, 0, 0)
+    title.Size = UDim2.new(0, 0, 0, 0)
+    title.Font = Enum.Font.Arial
+    title.Text = "YOU'RE DAED"
+    title.TextColor3 = Color3.new(139, 0, 0)
+    title.Position = UDim2.new(0.45, 0, 0.3, 0)
+    title.TextTransparency = 1
+    title.BackgroundTransparency = 1
+    title.TextSize = 100
+
+    -- Анимация фрейма main
+    local tween = TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 1, 0) })
+    tween:Play()
+
+    -- Задержка перед появлением текста "YOU'RE DAED"
+    Wait(3)
+
+    -- Анимация текста "YOU'RE DAED"
+    tween = TweenService:Create(title, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+    tween:Play()  -- Убедись, что эта строка выполняется до создания анимации для idiot
+
+    -- Задержка перед появлением текста "идиот"
+    wait(3)
+
+    -- Создание и настройка текста "идиот"
+    idiot = Instance.new("TextLabel")  -- Создает новый экземпляр TextLabel
+    idiot.Name = "idiot"
+    idiot.Parent = main
+    idiot.BackgroundColor3 = Color3.new(0, 0, 0)
+    idiot.Size = UDim2.new(0, 0, 0, 0)
+    idiot.Font = Enum.Font.Arial
+    idiot.Text = " IDIOT "
+    idiot.TextColor3 = Color3.new(255, 0, 0)
+    idiot.Position = UDim2.new(0.45, 0, 0.5, 0)
+    idiot.TextTransparency = 1
+    idiot.BackgroundTransparency = 1
+    idiot.TextSize = 50
+
+    -- Анимация текста "идиот"
+    tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+    tween:Play()
+
+    wait(6)
+
+    -- Создание и настройка белого экрана
+    whiteScreen.Name = "whiteScreen"
+    whiteScreen.Parent = main
+    whiteScreen.BackgroundColor3 = Color3.new(1, 1, 1)
+    whiteScreen.BorderSizePixel = 0
+    whiteScreen.Position = UDim2.new(0, 0, 0, 0)
+    whiteScreen.Size = UDim2.new(1, 0, 1, 0)
+    whiteScreen.Visible = false
+
+    -- Показ белого экрана
+    whiteScreen.Visible = true
+
+    wait(2)
+
+    -- Удаление белого экрана, main и idiot
+    idiot:Destroy()
+    whiteScreen.BackgroundTransparency = 1
+    title.Text = "S"
+    wait(0.35)
+    title.Text = "SY"
+    wait(0.35)
+    title.Text = "SYS"
+    wait(0.35)
+    title.Text = "SYST"
+    wait(0.35)
+    title.Text = "SYSTE"
+    wait(0.35)
+    title.Text = "SYSTEM"
+    wait(0.35)
+    title.Text = "SYSTEM R"
+    wait(0.35)
+    title.Text = "SYSTEM RE"
+    wait(0.35)
+    title.Text = "SYSTEM REB"
+    wait(0.35)
+    title.Text = "SYSTEM REBO"
+    wait(0.35)
+    title.Text = "SYSTEM REBOO"
+    wait(0.35)
+    title.Text = "SYSTEM REBOOT"
+
+    -- Создание и настройка метки hell
+    hell.Name = "hell"
+    hell.Parent = main
+    hell.BackgroundColor3 = Color3.new(0, 0, 0)
+    hell.Size = UDim2.new(0, 0, 0, 0)
+    hell.Font = Enum.Font.Arial
+    hell.Text = ""
+    hell.TextColor3 = Color3.new(0, 255, 0)  -- Хакерски зеленый
+    hell.TextTransparency = 1
+    hell.BackgroundTransparency = 1
+    hell.TextSize = 30
+    hell.Visible = true
+
+    -- Функция для генерации случайного символа
+    local function generateRandomCharacter()
+        local characters = "@%÷×√xxxxxabcdefghijklmnopqrstuv0123456789123456789000111"
+        return characters:sub(math.random(1, #characters), math.random(0.5, #characters))
+    end
+
+    -- Функция для отображения случайного символа
+    local function displayRandomCharacter()
+        hell.Text = generateRandomCharacter()
+        hell.Visible = true
+        local tween = TweenService:Create(hell, TweenInfo.new(1), { TextTransparency = 0 })
+        tween:Play()
+    end
+
+    -- Событие Heartbeat, которое отображает случайные символы
+    local event = game:GetService("RunService").Heartbeat:Connect(function()
+        displayRandomCharacter()
+        
+        -- Случайное перемещение метки hell на экране
+        hell.Position = UDim2.new(math.random(), 0, math.random(), 0)
+    end)
+
+    wait(5)
+    whiteScreen.BackgroundColor3 = Color3.new(1, 1, 0)
+    tween = TweenService:Create(whiteScreen, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {BackgroundTransparency = 0 })
+    tween:Play()
+    wait(3)
+    whiteScreen:Destroy()
+    main:Destroy()
+    hell:Destroy()
+    title:Destroy()
+
+end
