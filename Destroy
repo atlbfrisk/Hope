@@ -2,7 +2,7 @@ local dead = false
 local HealthTextLabel = game.Players.LocalPlayer.Character.Head.Display.Frame.Health.TextLabel
 HealthTextLabel.Changed:Connect(function()
     local HealthValue = tonumber(HealthTextLabel.Text:match("^(%d+)")) -- Извлечение первой цифры из текста
-    if HealthValue and HealthValue == 0 then
+    if HealthValue and HealthValue <= 0 then
         dead = true
     end
 end)
