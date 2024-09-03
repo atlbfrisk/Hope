@@ -1,0 +1,8 @@
+local Sound = Instance.new("Sound")
+Sound.Parent = game.Players.LocalPlayer.Backpack
+Sound.Volume = 1.6
+Sound.Playing = false -- Изменено на false, чтобы звук не проигрывался изначально
+Sound.Looped = false
+Sound.SoundId = "rbxassetid://4898185564"
+Sound.Name = "HARDMODE"
+Sound.PlaybackSpeed = 0.9
