@@ -1,0 +1,235 @@
+local ScreenGui = Instance.new("ScreenGui")
+local buttonForward = Instance.new("TextButton")
+local buttonBackward = Instance.new("TextButton")
+local buttonUp = Instance.new("TextButton")
+local buttonDown = Instance.new("TextButton")
+local buttonLeft = Instance.new("TextButton")
+local buttonRight = Instance.new("TextButton")
+local buttonFell = Instance.new("TextButton")
+local buttonFellDown = Instance.new("TextButton")  -- Кнопка Fell Down
+local statusLabelFell = Instance.new("TextLabel")   -- Метка состояния для Fell
+local statusLabelFellDown = Instance.new("TextLabel") -- Метка состояния для Fell Down
+
+-- Настройки ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Начальные значения расстояний
+local initialUpDistance = 20
+local initialDownDistance = 5
+local initialSideDistance = 10
+local initialForwardCompensation = 3
+local initialForwardDistance = 15
+local initialBackwardDistance = 10
+
+local upDistance = initialUpDistance
+local downDistance = initialDownDistance
+local sideDistance = initialSideDistance
+local forwardCompensation = initialForwardCompensation
+local forwardDistance = initialForwardDistance
+local backwardDistance = initialBackwardDistance
+
+local isFellActive = false  -- Переменная для состояния Fell
+local isFellDownActive = false  -- Переменная для состояния Fell Down
+
+-- Создание кнопок
+buttonUp.Size = UDim2.new(0, 50, 0, 50)
+buttonUp.Position = UDim2.new(0.4, 0, 0.1, 0)
+buttonUp.BackgroundColor3 = Color3.fromRGB(0,0, 0)
+buttonUp.Text = "^"
+buttonUp.TextColor3 = Color3.fromRGB(255,0,0)
+buttonUp.TextScaled = true
+buttonUp.Parent = ScreenGui
+
+buttonDown.Size = UDim2.new(0, 50, 0, 50)
+buttonDown.Position = UDim2.new(0.4, 0, 0.3, 0)
+buttonDown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonDown.Text = "v"
+buttonDown.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonDown.TextScaled = true
+buttonDown.Parent = ScreenGui
+
+buttonLeft.Size = UDim2.new(0, 50, 0, 50)
+buttonLeft.Position = UDim2.new(0.25, 0, 0.5, 0)
+buttonLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonLeft.Text = "<"
+buttonLeft.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonLeft.TextScaled = true
+buttonLeft.Parent = ScreenGui
+
+buttonRight.Size = UDim2.new(0, 50, 0, 50)
+buttonRight.Position = UDim2.new(0.55, 0, 0.5, 0)
+buttonRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonRight.Text = ">"
+buttonRight.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonRight.TextScaled = true
+buttonRight.Parent = ScreenGui
+
+buttonForward.Size = UDim2.new(0, 50, 0, 50)
+buttonForward.Position = UDim2.new(0.4, 0, 0.7, 0)
+buttonForward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonForward.Text = "rush"
+buttonForward.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonForward.TextScaled = true
+buttonForward.Parent = ScreenGui
+
+buttonBackward.Size = UDim2.new(0, 50, 0, 50)
+buttonBackward.Position = UDim2.new(0.4, 0, 0.9, 0)
+buttonBackward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonBackward.Text = "back"
+buttonBackward.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonBackward.TextScaled = true
+buttonBackward.Parent = ScreenGui
+
+-- Настройки кнопки Fell
+buttonFell.Size = UDim2.new(0, 100, 0, 50)
+buttonFell.Position = UDim2.new(0.15, 0, 0.5, 0) -- Позиция кнопки Fell
+buttonFell.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+buttonFell.Text = "Fell"
+buttonFell.TextColor3 = Color3.fromRGB(255, 255, 255)
+buttonFell.TextScaled = true
+buttonFell.Parent = ScreenGui
+
+-- Настройки кнопки Fell Down
+buttonFellDown.Size = UDim2.new(0, 100, 0, 50)
+buttonFellDown.Position = UDim2.new(0.15, 0, 0.6, 0) -- Позиция кнопки Fell Down
+buttonFellDown.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
+buttonFellDown.Text = "Fell Down"
+buttonFellDown.TextColor3 = Color3.fromRGB(255, 255, 255)
+buttonFellDown.TextScaled = true
+buttonFellDown.Parent = ScreenGui
+
+-- Настройки меток статуса
+statusLabelFell.Size = UDim2.new(0, 200, 0, 50)
+statusLabelFell.Position = UDim2.new(0.1, 0, 0.8, 0) -- Позиция метки Fell
+statusLabelFell.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+statusLabelFell.TextColor3 = Color3.fromRGB(0, 0, 0)
+statusLabelFell.TextScaled = true
+statusLabelFell.Text = "Fell is inactive"
+statusLabelFell.Parent = ScreenGui
+
+statusLabelFellDown.Size = UDim2.new(0, 200, 0, 50)
+statusLabelFellDown.Position = UDim2.new(0.1, 0, 0.9, 0) -- Позиция метки Fell Down
+statusLabelFellDown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+statusLabelFellDown.TextColor3 = Color3.fromRGB(0, 0, 0)
+statusLabelFellDown.TextScaled = true
+statusLabelFellDown.Text = "Fell Down is inactive"
+statusLabelFellDown.Parent = ScreenGui
+
+-- Функция для изменения расстояний для Fell
+local function toggleFell()
+    if isFellActive then
+        -- Возвращаем расстояния к исходным значениям
+        upDistance = initialUpDistance
+        downDistance = initialDownDistance
+        sideDistance = initialSideDistance
+        forwardCompensation = initialForwardCompensation
+        forwardDistance = initialForwardDistance
+        backwardDistance = initialBackwardDistance
+        statusLabelFell.Text = "Fell is inactive" -- Обновляем статус
+    else
+        -- Удваиваем расстояния
+        upDistance = upDistance * 2
+        downDistance = downDistance * 2
+        sideDistance = sideDistance * 2
+        forwardCompensation = forwardCompensation * 2
+        forwardDistance = forwardDistance * 2
+        backwardDistance = backwardDistance * 2
+        statusLabelFell.Text = "Fell is active" -- Обновляем статус
+    end
+    
+    isFellActive = not isFellActive -- Переключаем состояние
+
+    -- Если активен Fell Down, отключаем его
+    if isFellDownActive then
+        toggleFellDown()
+    end
+end
+
+-- Функция для изменения расстояний для Fell Down
+local function toggleFellDown()
+    if isFellDownActive then
+        -- Возвращаем расстояния к исходным значениям
+        upDistance = initialUpDistance
+        downDistance = initialDownDistance
+        sideDistance = initialSideDistance
+        forwardCompensation = initialForwardCompensation
+        forwardDistance = initialForwardDistance
+        backwardDistance = initialBackwardDistance
+        statusLabelFellDown.Text = "Fell Down is inactive" -- Обновляем статус
+    else
+        -- Умножаем расстояния на 10
+        upDistance = upDistance * 10
+        downDistance = downDistance * 10
+        sideDistance = sideDistance * 10
+        forwardCompensation = forwardCompensation * 10
+        forwardDistance = forwardDistance * 10
+        backwardDistance = backwardDistance * 10
+        statusLabelFellDown.Text = "Fell Down is active" -- Обновляем статус
+    end
+    
+    isFellDownActive = not isFellDownActive -- Переключаем состояние
+
+    -- Если активен Fell, отключаем его
+    if isFellActive then
+        toggleFell()
+    end
+end
+
+-- Функция телепортации
+local function teleport(direction)
+    local player = game.Players.LocalPlayer
+    -- Убедимся, что персонаж существует
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = player.Character.HumanoidRootPart
+        
+        -- Вычисляем новое положение
+        if direction == "up" then
+            humanoidRootPart.Position = humanoidRootPart.Position + Vector3.new(0, upDistance, 0)
+        elseif direction == "down" then
+            humanoidRootPart.Position = humanoidRootPart.Position - Vector3.new(0, downDistance, 0)
+        elseif direction == "left" then
+            humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+        elseif direction == "right" then
+            humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+        elseif direction == "forward" then
+            humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.LookVector * forwardDistance
+        elseif direction == "backward" then
+            humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.LookVector * backwardDistance
+        end
+    else
+        warn("Персонаж не найден!")
+    end
+end
+
+-- Обработка нажатия кнопок
+buttonUp.MouseButton1Click:Connect(function()
+    teleport("up")
+end)
+
+buttonDown.MouseButton1Click:Connect(function()
+    teleport("down")
+end)
+
+buttonLeft.MouseButton1Click:Connect(function()
+    teleport("left")
+end)
+
+buttonRight.MouseButton1Click:Connect(function()
+    teleport("right")
+end)
+
+buttonForward.MouseButton1Click:Connect(function()
+    teleport("forward")
+end)
+
+buttonBackward.MouseButton1Click:Connect(function()
+    teleport("backward")
+end)
+
+buttonFell.MouseButton1Click:Connect(function()
+    toggleFell() -- Вызываем функцию изменения расстояний
+end)
+
+buttonFellDown.MouseButton1Click:Connect(function()
+    toggleFellDown() -- Вызываем функцию изменения расстояний для Fell Down
+end)
