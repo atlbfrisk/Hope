@@ -33,7 +33,7 @@ local isFellDownActive = false  -- Переменная для состояни�
 
 -- Создание кнопок
 buttonUp.Size = UDim2.new(0, 50, 0, 50)
-buttonUp.Position = UDim2.new(0.4, 0, 0.1, 0)
+buttonUp.Position = UDim2.new(0.1, 0, 0.1, 0)
 buttonUp.BackgroundColor3 = Color3.fromRGB(0,0, 0)
 buttonUp.Text = "^"
 buttonUp.TextColor3 = Color3.fromRGB(255,0,0)
@@ -41,7 +41,7 @@ buttonUp.TextScaled = true
 buttonUp.Parent = ScreenGui
 
 buttonDown.Size = UDim2.new(0, 50, 0, 50)
-buttonDown.Position = UDim2.new(0.4, 0, 0.3, 0)
+buttonDown.Position = UDim2.new(0.2, 0, 0.1, 0)
 buttonDown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 buttonDown.Text = "v"
 buttonDown.TextColor3 = Color3.fromRGB(255, 0, 0)
@@ -49,7 +49,7 @@ buttonDown.TextScaled = true
 buttonDown.Parent = ScreenGui
 
 buttonLeft.Size = UDim2.new(0, 50, 0, 50)
-buttonLeft.Position = UDim2.new(0.25, 0, 0.5, 0)
+buttonLeft.Position = UDim2.new(0.1, 0, 0.2, 0)
 buttonLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 buttonLeft.Text = "<"
 buttonLeft.TextColor3 = Color3.fromRGB(255, 0, 0)
@@ -57,7 +57,7 @@ buttonLeft.TextScaled = true
 buttonLeft.Parent = ScreenGui
 
 buttonRight.Size = UDim2.new(0, 50, 0, 50)
-buttonRight.Position = UDim2.new(0.55, 0, 0.5, 0)
+buttonRight.Position = UDim2.new(0.2, 0, 0.2, 0)
 buttonRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 buttonRight.Text = ">"
 buttonRight.TextColor3 = Color3.fromRGB(255, 0, 0)
@@ -65,7 +65,7 @@ buttonRight.TextScaled = true
 buttonRight.Parent = ScreenGui
 
 buttonForward.Size = UDim2.new(0, 50, 0, 50)
-buttonForward.Position = UDim2.new(0.4, 0, 0.7, 0)
+buttonForward.Position = UDim2.new(0.15, 0, 0.15, 0)
 buttonForward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 buttonForward.Text = "rush"
 buttonForward.TextColor3 = Color3.fromRGB(255, 0, 0)
@@ -73,7 +73,7 @@ buttonForward.TextScaled = true
 buttonForward.Parent = ScreenGui
 
 buttonBackward.Size = UDim2.new(0, 50, 0, 50)
-buttonBackward.Position = UDim2.new(0.4, 0, 0.9, 0)
+buttonBackward.Position = UDim2.new(0.15, 0, 0.25, 0)
 buttonBackward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 buttonBackward.Text = "back"
 buttonBackward.TextColor3 = Color3.fromRGB(255, 0, 0)
