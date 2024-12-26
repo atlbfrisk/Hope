@@ -14,12 +14,12 @@ local statusLabelFellDown = Instance.new("TextLabel") -- Метка состоя
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Начальные значения расстояний
-local initialUpDistance = 20
-local initialDownDistance = 5
-local initialSideDistance = 10
-local initialForwardCompensation = 3
-local initialForwardDistance = 15
-local initialBackwardDistance = 10
+local initialUpDistance = 25
+local initialDownDistance = 25
+local initialSideDistance = 60
+local initialForwardCompensation = 60
+local initialForwardDistance = 75
+local initialBackwardDistance = 60
 
 local upDistance = initialUpDistance
 local downDistance = initialDownDistance
