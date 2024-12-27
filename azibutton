@@ -1,0 +1,65 @@
+local ScreenGui = Instance.new("ScreenGui")
+local TextButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner") -- Создаем объект UICorner
+
+-- Настройка интерфейса
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+TextButton.Parent = ScreenGui
+TextButton.Size = UDim2.new(0, 200, 0, 100) -- Размер кнопки
+TextButton.Position = UDim2.new(0.5, -100, 0.5, -50) -- Позиция кнопки
+TextButton.Text = "Fell"
+TextButton.TextSize = 24
+TextButton.TextColor3 = Color3.new(1, 1, 1) -- Цвет текста (белый)
+TextButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Начальный цвет фона (красный)
+TextButton.AutoButtonColor = false -- Отключаем автоматическое изменение цвета
+
+-- Добавляем UICorner для закругления углов
+UICorner.Parent = TextButton
+UICorner.CornerRadius = UDim.new(0, 20) -- Устанавливаем радиус закругления
+
+-- Градиенты
+local gradient = Instance.new("UIGradient", TextButton)
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.new(1, 0, 0)), -- Красный
+    ColorSequenceKeypoint.new(1, Color3.new(0, 0, 1))  -- Синий
+})
+
+-- Эффект при наведении
+TextButton.MouseEnter:Connect(function()
+    TextButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Зеленый при наведении
+end)
+
+TextButton.MouseLeave:Connect(function()
+    TextButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Возвращаем красный
+end)
+
+-- Анимация при нажатии
+TextButton.MouseButton1Click:Connect(function()
+    TextButton.Size = UDim2.new(0, 220, 0, 110) -- Увеличиваем размер
+    wait(0.1)
+    TextButton.Size = UDim2.new(0, 200, 0, 100) -- Возвращаем размер
+end)
+
+-- Цвета для перебора
+local colors = {
+    Color3.new(1, 0, 0), Color3.new(0, 1, 0), Color3.new(0, 0, 1),
+    Color3.new(1, 1, 0), Color3.new(1, 0.5, 0), Color3.new(0.5, 0, 0.5),
+    Color3.new(0, 1, 1), Color3.new(1, 0, 1), Color3.new(0.5, 0.5, 0.5),
+    Color3.new(1, 0.7, 0.3), Color3.new(0.3, 1, 0.3), Color3.new(0.3, 0.3, 1),
+    Color3.new(1, 0, 0.5), Color3.new(0.5, 1, 0.5), Color3.new(1, 0.5, 1),
+    Color3.new(0, 0.5, 0.5), Color3.new(0.5, 0, 0), Color3.new(0, 0.5, 0),
+    Color3.new(0, 0, 0.5), Color3.new(1, 0.5, 0), Color3.new(0.5, 0, 1)
+}
+
+-- Функция для смены цвета
+local index = 1
+while true do
+    TextButton.BackgroundColor3 = colors[index]
+    TextButton.TextColor3 = Color3.new(1 - colors[index].r, 1 - colors[index].g, 1 - colors[index].b) -- Инвертирование цвета для текста
+    index = index + 1
+    if index > #colors then
+        index = 1 -- Вернуться к первому цвету
+    end
+    wait(1) -- Поменять цвет раз в секунду
+end
