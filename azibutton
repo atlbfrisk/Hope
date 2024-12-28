@@ -6,7 +6,7 @@ local UICorner = Instance.new("UICorner") -- Создаем объект UICorne
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 TextButton.Parent = ScreenGui
-TextButton.Size = UDim2.new(0, 200, 0, 100) -- Размер кнопки
+TextButton.Size = UDim2.new(0, 100, 0, 50) -- Размер кнопки
 TextButton.Position = UDim2.new(0.5, -100, 0.5, -50) -- Позиция кнопки
 TextButton.Text = "Fell"
 TextButton.TextSize = 24
@@ -36,9 +36,9 @@ end)
 
 -- Анимация при нажатии
 TextButton.MouseButton1Click:Connect(function()
-    TextButton.Size = UDim2.new(0, 220, 0, 110) -- Увеличиваем размер
+    TextButton.Size = UDim2.new(0, 101, 0, 51) -- Увеличиваем размер
     wait(0.1)
-    TextButton.Size = UDim2.new(0, 200, 0, 100) -- Возвращаем размер
+    TextButton.Size = UDim2.new(0, 100, 0, 50) -- Возвращаем размер
 end)
 
 -- Цвета для перебора
