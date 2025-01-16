@@ -1,0 +1,107 @@
+local key = Enum.KeyCode.X -- клавиша для переключения невидимости
+
+--// не редактируйте скрипт ниже
+локальный invis_on = false
+
+-- Создание GUI
+локальный игрок = game.Players.LocalPlayer
+локальный screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+локальный фрейм = Instance.new("Frame", screenGui)
+локальная toggleButton = Instance.new("TextButton", frame)
+локальная closeButton = Instance.new("TextButton", frame)
+локальная подписьLabel = Instance.new("TextLabel", frame)
+
+frame.Size = UDim2.new(0, 220, 0, 120)
+frame.Position = UDim2.new(0.5, -110, 0.5, -60)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+кадр.Активный = истина
+frame.Draggable = true
+
+toggleButton.Размер = UDim2.новый(0, 200, 0, 50)
+toggleButton.Position = UDim2.new(0, 10, 0, 30) -- Переместим кнопку вниз
+toggleButton.Text = "Включить невидимость"
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Font = Enum.Font.SourceSans
+toggleButton.Размер текста = 24
+
+closeButton.Размер = UDim2.новый(0, 20, 0, 20)
+closeButton.Position = UDim2.new(1, -30, 0, 5) -- Переместим кнопку вверх
+closeButton. Текст = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSans
+closeButton.Размер текста = 18
+
+подписьLabel.Размер = UDim2.новый(0, 200, 0, 20)
+подписьLabel.Position = UDim2.new(0, 10, 1, -25)
+signatureLabel.Text = "Автор: Theqop - https://t.me/virusscript"
+подписьLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+подписьLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+подписьLabel.Font = Enum.Font.SourceSans
+подписьLabel.TextSize = 14
+
+-- Создание звукового объекта
+локальный звук = Instance.new("Звук", player:WaitForChild("PlayerGui"))
+звук.SoundId = "rbxassetid://942127495"
+звук.Громкость = 1
+
+локальная функция setTransparency(символ, прозрачность)
+    для _, часть в парах(character:GetDescendants()) сделать
+        если часть:IsA("BasePart") или часть:IsA("Decal") тогда
+часть.Прозрачность = прозрачность
+        конец
+    конец
+конец
+
+локальная функция toggleInvisibility()
+    invis_on = не invis_on
+    звук:Воспроизведение()
+    если invis_on тогда
+        локальная сохраненная pos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        ждать()
+        game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+        подождите(.15)
+        local Seat = Instance.new('Seat', game.Workspace)
+        Seat.Anchored = false
+        Seat.CanCollide = ложь
+        Имя сиденья = 'invischair'
+        Seat.Transparency = 1 -- Сделаем кирпич невидимым
+        Сиденье.Положение = Вектор3.новый(-25.95, 84, 35370.55)
+        локальная сварка = экземпляр.new("Сварка", Место)
+        Сварная часть0 = Сиденье
+        Сварка.Часть1 = игра.Игроки.ЛокальныйИгрок.Персонаж:НайтиПервогоРебенка("Торс") или игра.Игроки.ЛокальныйИгрок.Персонаж.ВерхнийТорс
+        ждать()
+        Seat.CFrame = сохраненная позиция
+        setTransparency(игра.Игроки.ЛокальныйИгрок.Персонаж, 0.5)
+        game.StarterGui:SetCore("ОтправитьУведомление", {
+            Заголовок = "Невидимый";
+            Продолжительность = 1;
+            Текст = "";
+        })
+    еще
+        локальный invisChair = рабочее пространство:FindFirstChild('invischair')
+        если invisChair тогда
+            invisChair:Уничтожить()
+        конец
+        setTransparency(игра.Игроки.ЛокальныйИгрок.Персонаж, 0)
+        game.StarterGui:SetCore("ОтправитьУведомление", {
+            Заголовок = "Невидимость выключена";
+            Продолжительность = 1;
+            Текст = "";
+        })
+    конец
+конец
+
+-- Подписка на нажатие кнопки
+toggleButton.MouseButton1Click:Connect(toggleInvisibility)
+
+-- функция закрытия меню
+локальная функция closeMenu()
+    frame.Visible = false
+конец
+
+-- Подписка на событие нажатия кнопки закрытия
+closeButton.MouseButton1Click:Подключиться(закрытьМеню)
+
+-- Автор: Theqop - Вирусный скрипт https://t.me/virusscript
