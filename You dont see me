@@ -10,17 +10,21 @@ local frame = Instance.new("Frame", screenGui)
 local toggleButton = Instance.new("TextButton", frame)
 
 frame.Size = UDim2.new(0, 110, 0, 50)
-frame.Position = UDim2.new(0.5, 400, 0.5, -350)
-frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Position = UDim2.new(0.5, 400, 0.5, -350) -- Центрируем фрейм
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 frame.Active = true
 
 toggleButton.Size = UDim2.new(0, 100, 0, 40)
-toggleButton.Position = UDim2.new(0,5, 0,5) -- Переместим кнопку вниз
+toggleButton.Position = UDim2.new(0, 5, 0, 5) -- Переместим кнопку вниз
 toggleButton.Text = "Surprise"
-toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.BackgroundColor3 = Color3.fromRGB(128, 0, 255)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 0)
 toggleButton.Font = Enum.Font.SourceSans
 toggleButton.TextSize = 24
+
+-- Эффект свечения для текста
+toggleButton.TextStrokeTransparency = 0.5 -- Уменьшите значение для более сильного эффекта
+toggleButton.TextStrokeColor3 = Color3.fromRGB(255, 255, 255) -- Цвет обводки
 
 -- Создание звукового объекта
 local sound = Instance.new("Sound", player:WaitForChild("PlayerGui"))
@@ -30,7 +34,7 @@ sound.Volume = 1
 local function setTransparency(character, transparency)
     for _, part in pairs(character:GetDescendants()) do
         if part:IsA("BasePart") or part:IsA("Decal") then
-part.Transparency = transparency
+            part.Transparency = transparency
         end
     end
 end
@@ -73,14 +77,13 @@ local function toggleInvisibility()
         })
     end
 end
-
 -- Подписка на событие нажатия кнопки
 toggleButton.MouseButton1Click:Connect(toggleInvisibility)
 
--- Функция для закрытия меню
+-- Функция для закрытия меню (если есть кнопка закрытия)
 local function closeMenu()
     frame.Visible = false
 end
 
--- Подписка на событие нажатия кнопки закрытия
-closeButton.MouseButton1Click:Connect(closeMenu)
+-- Если у вас есть кнопка закрытия, подключите ее (например, closeButton)
+-- closeButton.MouseButton1Click:Connect(closeMenu)
