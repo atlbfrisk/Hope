@@ -14,8 +14,8 @@ local statusLabelFellDown = Instance.new("TextLabel") -- Метка состоя
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Начальные значения расстояний
-local initialUpDistance = 25
-local initialDownDistance = 25
+local initialUpDistance = 50
+local initialDownDistance = 50
 local initialSideDistance = 60
 local initialForwardCompensation = 60
 local initialForwardDistance = 75
@@ -100,7 +100,7 @@ buttonFellDown.Parent = ScreenGui
 
 -- Настройки меток статуса
 statusLabelFell.Size = UDim2.new(0, 200, 0, 50)
-statusLabelFell.Position = UDim2.new(0.1, 0, 0.8, 0) -- Позиция метки Fell
+statusLabelFell.Position = UDim2.new(0.25, 0, 0.008, 0) -- Позиция метки Fell
 statusLabelFell.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 statusLabelFell.TextColor3 = Color3.fromRGB(0, 0, 0)
 statusLabelFell.TextScaled = true
@@ -108,7 +108,7 @@ statusLabelFell.Text = "Fell is inactive"
 statusLabelFell.Parent = ScreenGui
 
 statusLabelFellDown.Size = UDim2.new(0, 200, 0, 50)
-statusLabelFellDown.Position = UDim2.new(0.1, 0, 0.9, 0) -- Позиция метки Fell Down
+statusLabelFellDown.Position = UDim2.new(0.25, 0, 0.09, 0) -- Позиция метки Fell Down
 statusLabelFellDown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 statusLabelFellDown.TextColor3 = Color3.fromRGB(0, 0, 0)
 statusLabelFellDown.TextScaled = true
