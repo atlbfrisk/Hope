@@ -1,4 +1,117 @@
-    -- Останавливаем музыку и удаляем интерфейс
+local ScreenGui = Instance.new("ScreenGui")
+local buttonReborn = Instance.new("TextButton")
+local symbols = "1234567890#%_-+()/@*'\"\\;:!?×÷^√∆-+=<>[]=}{|•°π⌀¿¿¿¿¿????''’’~…§"
+
+-- Настройки ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Настройки кнопки Reborn
+buttonReborn.Size = UDim2.new(0, 100, 0, 50)
+buttonReborn.Position = UDim2.new(0.08, 0, 0.5, 0)
+buttonReborn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonReborn.Text = "Reborn"
+buttonReborn.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonReborn.TextScaled = true
+buttonReborn.Parent = ScreenGui
+
+-- Функция для генерации случайного цвета
+local function getRandomColor()
+    if math.random() <= 0.65 then
+        return Color3.fromRGB(0, 0, 0)
+    else
+        local colors = {
+            Color3.fromRGB(255, 0, 0),
+            Color3.fromRGB(0, 0, 255)
+        }
+        return colors[math.random(1, #colors)]
+    end
+end
+
+-- Функция для создания окружности с символами
+local function createCircle(radius, parent, symbolCount, positionOffsetX, yOffset, symbolSize)
+    local angleStep = 360 / symbolCount
+
+    for i = 1, symbolCount do
+        local symbolLabel = Instance.new("TextLabel")
+        symbolLabel.Size = UDim2.new(0, symbolSize, 0, symbolSize)
+        symbolLabel.BackgroundTransparency = 1
+        symbolLabel.TextColor3 = getRandomColor()
+        symbolLabel.TextScaled = true
+        symbolLabel.Text = symbols:sub(math.random(1, #symbols), math.random(1, #symbols))
+        symbolLabel.Parent = parent
+
+        local angle = math.rad(angleStep * i)
+        symbolLabel.Position = UDim2.new(
+            0.5 + (radius * math.cos(angle)) / 100 + positionOffsetX,
+            0,
+            0.5 + (radius * math.sin(angle)) / 100 + yOffset,
+            0
+        )
+    end
+end
+
+-- Настройки окружностей
+local circleSizes = {64, 75, 85}
+local symbolCounts = {110, 140, 210}
+local positionOffsets = {-4, -3.6, -3.2}
+local yOffsets = {0.25, 0.2, 0.15}
+local symbolSizes = {25, 27, 34}
+local maxCircles = #circleSizes
+
+for i = 1, maxCircles do
+    local radius = circleSizes[i]
+    local circleFrame = Instance.new("Frame")
+    circleFrame.Size = UDim2.new(0, 130 + (i - 1) * 20, 0, 70 + (i - 1) * 20)
+    circleFrame.Position = UDim2.new(0.5, positionOffsets[i], 0.5, -(70 + (i - 1) * 20) / 2)
+    circleFrame.BackgroundTransparency = 1
+    circleFrame.Parent = ScreenGui
+    createCircle(radius, circleFrame, symbolCounts[i], positionOffsets[i], yOffsets[i], symbolSizes[i])
+end
+
+-- Музыка
+local currentSound
+local isStopped = false
+
+local function playSound(soundId, volume, playbackSpeed, parent, onEnded)
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+    end
+    currentSound = Instance.new("Sound")
+    currentSound.Parent = parent
+    currentSound.Volume = volume
+    currentSound.SoundId = soundId
+    currentSound.PlaybackSpeed = playbackSpeed
+    currentSound.Looped = false
+    currentSound:Play()
+    currentSound.Ended:Connect(onEnded)
+end
+
+-- Функция для начала плейлиста
+local function startPlaylist()
+    if isStopped then return end
+
+    playSound("rbxassetid://86726776583600", 2, 1.2, game.Players.LocalPlayer    .Character.Head, function()
+        if isStopped then return end
+        playSound("rbxassetid://142376088", 1, 1, game.Players.LocalPlayer.Backpack, function()
+            if isStopped then return end
+            playSound("rbxassetid://94748704644139", 1, 1, game.Players.LocalPlayer.Backpack, function()
+                if not isStopped then
+                    startPlaylist() -- Запускаем плейлист снова, если кнопка не была нажата
+                end
+            end)
+        end)
+    end)
+end
+
+-- Запускаем плейлист
+startPlaylist()
+
+-- Обработка нажатия кнопки Reborn
+buttonReborn.MouseButton1Click:Connect(function()
+    print("Кнопка Reborn нажата!")
+    isStopped = true -- Устанавливаем флаг, чтобы остановить плейлист
+    -- Останавливаем текущий звук и удаляем интерфейс
     if currentSound then
         currentSound:Stop()
         currentSound:Destroy()
