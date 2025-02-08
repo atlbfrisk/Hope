@@ -1,0 +1,10 @@
+    -- Останавливаем музыку и удаляем интерфейс
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+        currentSound = nil
+    end
+    if ScreenGui then
+        ScreenGui:Destroy()
+    end
+end)
