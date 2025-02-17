@@ -297,17 +297,25 @@ buttonReborn.MouseButton1Click:Connect(function()
         -- Воспроизведение звука
         local finalSound = Instance.new("Sound")
         finalSound.Parent = game.Players.LocalPlayer.Character.Head
-        finalSound.Volume = 150
+        finalSound.Volume = 10
         finalSound.Looped = false
         finalSound.SoundId = "rbxassetid://642336941"
         finalSound.Name = "text"
         finalSound.PlaybackSpeed = 1
-        wait(0.1)
+        finalSound.Playing = true
+        wait(0.9)
         finalSound:Destroy()
 
         -- Задержка перед запуском второго скрипта
         wait(5)
-
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Character.Head
+        Sound.Volume = 10 
+        Sound.Playing = true 
+        Sound.Looped = false 
+        Sound.SoundId = "rbxassetid://93086114912238" 
+        Sound.Name = "you idiot v2" 
+        Sound.PlaybackSpeed = 0.98
         -- Второй скрипт
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
@@ -355,3 +363,4 @@ buttonReborn.MouseButton1Click:Connect(function()
         end)
     end
 end)
+
