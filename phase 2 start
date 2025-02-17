@@ -1,3 +1,4 @@
+-- Ваш первый скрипт
 local ScreenGui = Instance.new("ScreenGui")
 local buttonReborn = Instance.new("TextButton")
 local symbols = "1234567890#%_-+()/@*'\"\\;:!?×÷^√∆-+=<>[]=}{|•°π⌀¿¿¿¿¿????''’’~…§"
@@ -49,7 +50,6 @@ local function createCircle(radius, parent, symbolCount, positionOffsetX, yOffse
         )
     end
 end
-
 -- Настройки окружностей
 local circleSizes = {64, 75, 85}
 local symbolCounts = {110, 140, 210}
@@ -184,7 +184,6 @@ buttonReborn.MouseButton1Click:Connect(function()
         idiot.BackgroundTransparency = 1
         idiot.TextSize = 50
 
-        -- Анимация текста "идиот"
                 -- Анимация текста "идиот"
         tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
         tween:Play()
@@ -288,19 +287,13 @@ buttonReborn.MouseButton1Click:Connect(function()
         k:AdjustSpeed(1.45)
         wait(3)
 
+        -- Удаление объектов
         whiteScreen:Destroy()
         main:Destroy()
         hell:Destroy()
         title:Destroy()
 
-        -- Воспроизведение финальной анимации
-                -- Воспроизведение финальной анимации
-        local finalAnim = Instance.new("Animation")
-        finalAnim.AnimationId = "rbxassetid://13624084239"
-        local finalAnimation = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(finalAnim)
-        finalAnimation:Play()
-        finalAnimation:AdjustSpeed(1)
-
+        -- Воспроизведение звука
         -- Воспроизведение звука
         local finalSound = Instance.new("Sound")
         finalSound.Parent = game.Players.LocalPlayer.Character.Head
@@ -311,13 +304,54 @@ buttonReborn.MouseButton1Click:Connect(function()
         finalSound.PlaybackSpeed = 1
         wait(0.1)
         finalSound:Destroy()
-    end
-end)
 
--- Обработка изменения здоровья
-HealthTextLabel.Changed:Connect(function()
-    local HealthValue = tonumber(HealthTextLabel.Text:match("^(%d+)")) -- Извлечение первой цифры из текста
-    if HealthValue and HealthValue <= 0 then
-        dead = true
+        -- Задержка перед запуском второго скрипта
+        wait(5)
+
+        -- Второй скрипт
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        -- Создание анимаций
+        local runningAnim = Instance.new("Animation")
+        runningAnim.AnimationId = "rbxassetid://13624084239" -- Анимация при движении
+        local runningTrack = humanoid:LoadAnimation(runningAnim)
+
+        local idleAnim = Instance.new("Animation")
+        idleAnim.AnimationId = "rbxassetid://13384901306" -- Анимация при стоянии
+        local idleTrack = humanoid:LoadAnimation(idleAnim)
+
+        -- Функция для воспроизведения анимации при движении
+        local function onRunning(speed)
+            if speed > 0 then
+                if not runningTrack.IsPlaying then
+                    idleTrack:Stop() -- Остановить анимацию стояния, если она играет
+                    runningTrack:Play() -- Воспроизвести анимацию движения
+                    runningTrack:AdjustSpeed(1) -- Установите скорость анимации
+                end
+            else
+                if runningTrack.IsPlaying then
+                    runningTrack:Stop() -- Остановить анимацию движения
+                end
+                if not idleTrack.IsPlaying then
+                    idleTrack:Play() -- Воспроизвести анимацию стояния
+                    idleTrack:AdjustSpeed(1) -- Установите скорость анимации
+                end
+            end
+        end
+
+        -- Подключение к событию Running
+        humanoid.Running:Connect(onRunning)
+
+        -- Обработка ситуации, когда персонаж умирает
+        character.Humanoid.Died:Connect(function()
+            if runningTrack.IsPlaying then
+                runningTrack:Stop()
+            end
+            if idleTrack.IsPlaying then
+                idleTrack:Stop()
+            end
+        end)
     end
 end)
