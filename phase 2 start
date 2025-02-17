@@ -1,0 +1,323 @@
+local ScreenGui = Instance.new("ScreenGui")
+local buttonReborn = Instance.new("TextButton")
+local symbols = "1234567890#%_-+()/@*'\"\\;:!?×÷^√∆-+=<>[]=}{|•°π⌀¿¿¿¿¿????''’’~…§"
+
+-- Настройки ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Настройки кнопки Reborn
+buttonReborn.Size = UDim2.new(0, 100, 0, 50)
+buttonReborn.Position = UDim2.new(0.08, 0, 0.5, 0)
+buttonReborn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonReborn.Text = "Reborn"
+buttonReborn.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonReborn.TextScaled = true
+buttonReborn.Parent = ScreenGui
+
+-- Функция для генерации случайного цвета
+local function getRandomColor()
+    if math.random() <= 0.65 then
+        return Color3.fromRGB(0, 0, 0)
+    else
+        local colors = {
+            Color3.fromRGB(255, 0, 0),
+            Color3.fromRGB(0, 0, 255)
+        }
+        return colors[math.random(1, #colors)]
+    end
+end
+
+-- Функция для создания окружности с символами
+local function createCircle(radius, parent, symbolCount, positionOffsetX, yOffset, symbolSize)
+    local angleStep = 360 / symbolCount
+
+    for i = 1, symbolCount do
+        local symbolLabel = Instance.new("TextLabel")
+        symbolLabel.Size = UDim2.new(0, symbolSize, 0, symbolSize)
+        symbolLabel.BackgroundTransparency = 1
+        symbolLabel.TextColor3 = getRandomColor()
+        symbolLabel.TextScaled = true
+        symbolLabel.Text = symbols:sub(math.random(1, #symbols), math.random(1, #symbols))
+        symbolLabel.Parent = parent
+
+        local angle = math.rad(angleStep * i)
+        symbolLabel.Position = UDim2.new(
+            0.5 + (radius * math.cos(angle)) / 100 + positionOffsetX,
+            0,
+            0.5 + (radius * math.sin(angle)) / 100 + yOffset,
+            0
+        )
+    end
+end
+
+-- Настройки окружностей
+local circleSizes = {64, 75, 85}
+local symbolCounts = {110, 140, 210}
+local positionOffsets = {-4, -3.6, -3.2}
+local yOffsets = {0.25, 0.2, 0.15}
+local symbolSizes = {25, 27, 34}
+local maxCircles = #circleSizes
+
+for i = 1, maxCircles do
+    local radius = circleSizes[i]
+    local circleFrame = Instance.new("Frame")
+    circleFrame.Size = UDim2.new(0, 130 + (i - 1) * 20, 0, 70 + (i - 1) * 20)
+    circleFrame.Position = UDim2.new(0.5, positionOffsets[i], 0.5, -(70 + (i - 1) * 20) / 2)
+    circleFrame.BackgroundTransparency = 1
+    circleFrame.Parent = ScreenGui
+    createCircle(radius, circleFrame, symbolCounts[i], positionOffsets[i], yOffsets[i], symbolSizes[i])
+end
+
+-- Музыка
+local currentSound
+local isStopped = false
+
+local function playSound(soundId, volume, playbackSpeed, parent, onEnded)
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+    end
+    currentSound = Instance.new("Sound")
+    currentSound.Parent = parent
+    currentSound.Volume = volume
+    currentSound.SoundId = soundId
+    currentSound.PlaybackSpeed = playbackSpeed
+    currentSound.Looped = false
+    currentSound:Play()
+    currentSound.Ended:Connect(onEnded)
+end
+
+-- Функция для начала плейлиста
+local function startPlaylist()
+    if isStopped then return end
+
+    playSound("rbxassetid://86726776583600", 2, 1.2, game.Players.LocalPlayer.Character.Head, function()
+        if isStopped then return end
+        playSound("rbxassetid://142376088", 1, 1, game.Players.LocalPlayer.Backpack, function()
+            if isStopped then return end
+            playSound("rbxassetid://94748704644139", 1, 1, game.Players.LocalPlayer.Backpack, function()
+                if not isStopped then
+                    startPlaylist() -- Запускаем плейлист снова, если кнопка не была нажата
+                end
+            end)
+        end)
+    end)
+end
+
+-- Запускаем плейлист
+startPlaylist()
+
+-- Обработка нажатия кнопки Reborn
+buttonReborn.MouseButton1Click:Connect(function()
+    print("Кнопка Reborn нажата!")
+    isStopped = true -- Устанавливаем флаг, чтобы остановить плейлист
+
+    -- Останавливаем текущий звук и удаляем интерфейс
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+        currentSound = nil
+    end
+    if ScreenGui then
+        ScreenGui:Destroy()
+    end
+
+    -- Запуск второго скрипта
+    local dead = true
+    local HealthTextLabel = game.Players.LocalPlayer.Character.Head.Display.Frame.Health.TextLabel
+    if dead == true then
+        local TweenService = game:GetService("TweenService")
+        local ScreenGui2 = Instance.new("ScreenGui")
+        local main = Instance.new("Frame")
+        local title = Instance.new("TextLabel")
+        local idiot = Instance.new("TextLabel")
+        local whiteScreen = Instance.new("Frame")
+        local hell = Instance.new("TextLabel")
+        ScreenGui2.Parent = game.CoreGui
+
+        -- Создание и настройка фрейма main
+        main.Name = "main"
+        main.Parent = ScreenGui2
+        main.BackgroundColor3 = Color3.new(0, 0, 0)
+        main.BorderSizePixel = 0
+        main.Position = UDim2.new(0, 0, 0, -24)
+        main.Size = UDim2.new(1, 0, 0, 0)
+        main.Visible = true
+
+        -- Создание и настройка текста "YOU'RE DEAD"
+        title.Name = "title"
+        title.Parent = main
+        title.BackgroundColor3 = Color3.new(0, 0, 0)
+        title.Size = UDim2.new(0, 0, 0, 0)
+        title.Font = Enum.Font.Arial
+        title.Text = "YOU'RE DEAD"
+        title.TextColor3 = Color3.new(139, 0, 0)
+        title.Position = UDim2.new(0.45, 0, 0.3, 0)
+        title.TextTransparency = 1
+        title.BackgroundTransparency = 1
+        title.TextSize = 100
+
+        -- Анимация фрейма main
+        local tween = TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 1, 0) })
+        tween:Play()
+
+        -- Задержка перед появлением текста "YOU'RE DEAD"
+        wait(3)
+
+        -- Анимация текста "YOU'RE DEAD"
+        tween = TweenService:Create(title, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+        tween:Play()
+
+        -- Задержка перед появлением текста "идиот"
+        wait(3)
+
+        -- Создание и настройка текста "идиот"
+        idiot.Name = "idiot"
+        idiot.Parent = main
+        idiot.BackgroundColor3 = Color3.new(0, 0, 0)
+        idiot.Size = UDim2.new(0, 0, 0, 0)
+        idiot.Font = Enum.Font.Arial
+        idiot.Text = "[ IDIOT ]"
+        idiot.TextColor3 = Color3.new(255, 0, 0)
+        idiot.Position = UDim2.new(0.45, 0, 0.5, 0)
+        idiot.TextTransparency = 1
+        idiot.BackgroundTransparency = 1
+        idiot.TextSize = 50
+
+        -- Анимация текста "идиот"
+                -- Анимация текста "идиот"
+        tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+        tween:Play()
+
+        wait(5.1)
+
+        -- Создание и настройка белого экрана
+        whiteScreen.Name = "whiteScreen"
+        whiteScreen.Parent = main
+        whiteScreen.BackgroundColor3 = Color3.new(1, 1, 1)
+        whiteScreen.BorderSizePixel = 0
+        whiteScreen.Position = UDim2.new(0, 0, 0, 0)
+        whiteScreen.Size = UDim2.new(1, 0, 1, 0)
+        whiteScreen.Visible = false
+        whiteScreen.Visible = true
+
+        wait(2)
+
+        -- Удаление белого экрана, main и idiot
+        idiot:Destroy()
+        whiteScreen.BackgroundTransparency = 1
+        title.Text = "S"
+        wait(0.25)
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Character.Head
+        Sound.Volume = 150
+        Sound.Playing = true
+        Sound.Looped = false
+        Sound.SoundId = "rbxassetid://9113128037"
+        Sound.Name = "text"
+        Sound.PlaybackSpeed = 1
+        title.Text = "SY"
+        wait(0.25)
+        title.Text = "SYS"
+        wait(0.25)
+        title.Text = "SYST"
+        wait(0.25)
+        title.Text = "SYSTE"
+        wait(0.25)
+        title.Text = "SYSTEM"
+        wait(0.25)
+        title.Text = "SYSTEM R"
+        wait(0.25)
+        title.Text = "SYSTEM RE"
+        wait(0.25)
+        title.Text = "SYSTEM REB"
+        wait(0.25)
+        title.Text = "SYSTEM REBO"
+        wait(0.25)
+        title.Text = "SYSTEM REBOO"
+        wait(0.25)
+        title.Text = "SYSTEM REBOOT"
+        wait(0.1)
+        Sound:Destroy()
+
+        -- Создание и настройка метки hell
+        hell.Name = "hell"
+        hell.Parent = main
+        hell.BackgroundColor3 = Color3.new(0, 0, 0)
+        hell.Size = UDim2.new(0, 0, 0, 0)
+        hell.Font = Enum.Font.Arial
+        hell.Text = ""
+        hell.TextColor3 = Color3.new(0, 255, 0)  -- Хакерски зеленый
+        hell.TextTransparency = 1
+        hell.BackgroundTransparency = 1
+        hell.TextSize = 30
+        hell.Visible = true
+
+        -- Функция для генерации случайного символа
+        local function generateRandomCharacter()
+            local characters = "@%÷×√xxxxxabcdefghijklmnopqrstuv0123456789123456789000111"
+            return characters:sub(math.random(1, #characters), math.random(1, #characters))
+        end
+
+        -- Функция для отображения случайного символа
+        local function displayRandomCharacter()
+            hell.Text = generateRandomCharacter()
+            hell.Visible = true
+            local tween = TweenService:Create(hell, TweenInfo.new(1), { TextTransparency = 0 })
+            tween:Play()
+        end
+
+        -- Событие Heartbeat, которое отображает случайные символы
+        local event = game:GetService("RunService").Heartbeat:Connect(function()
+            displayRandomCharacter()
+
+            -- Случайное перемещение метки hell на экране
+            hell.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        end)
+
+        wait(5)
+        whiteScreen.BackgroundColor3 = Color3.new(1, 1, 0)
+        tween = TweenService:Create(whiteScreen, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 })
+        tween:Play()
+
+        -- Анимация персонажа
+        local Anim = Instance.new("Animation")
+        Anim.AnimationId = "rbxassetid://13045731482"
+        local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+        k:Play()
+        k:AdjustSpeed(1.45)
+        wait(3)
+
+        whiteScreen:Destroy()
+        main:Destroy()
+        hell:Destroy()
+        title:Destroy()
+
+        -- Воспроизведение финальной анимации
+                -- Воспроизведение финальной анимации
+        local finalAnim = Instance.new("Animation")
+        finalAnim.AnimationId = "rbxassetid://13624084239"
+        local finalAnimation = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(finalAnim)
+        finalAnimation:Play()
+        finalAnimation:AdjustSpeed(1)
+
+        -- Воспроизведение звука
+        local finalSound = Instance.new("Sound")
+        finalSound.Parent = game.Players.LocalPlayer.Character.Head
+        finalSound.Volume = 150
+        finalSound.Looped = false
+        finalSound.SoundId = "rbxassetid://642336941"
+        finalSound.Name = "text"
+        finalSound.PlaybackSpeed = 1
+        wait(0.1)
+        finalSound:Destroy()
+    end
+end)
+
+-- Обработка изменения здоровья
+HealthTextLabel.Changed:Connect(function()
+    local HealthValue = tonumber(HealthTextLabel.Text:match("^(%d+)")) -- Извлечение первой цифры из текста
+    if HealthValue and HealthValue <= 0 then
+        dead = true
+    end
+end)
