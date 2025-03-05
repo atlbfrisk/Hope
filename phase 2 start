@@ -218,24 +218,34 @@ buttonReborn.MouseButton1Click:Connect(function()
         title.Text = "SY"
         wait(0.25)
         title.Text = "SYS"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYST"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTE"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM R"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM RE"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM REB"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM REBO"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM REBOO"
+        Sound.Playing = true
         wait(0.25)
         title.Text = "SYSTEM REBOOT"
+        Sound.Playing = true
         wait(0.1)
         Sound:Destroy()
 
