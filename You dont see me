@@ -45,7 +45,11 @@ local function toggleInvisibility()
     if invis_on then
         local savedpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
         wait()
-        game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+
+        -- Перемещаем тело на 10000 блоков позади персонажа
+        local newPosition = savedpos.Position - (savedpos.LookVector * 10000) -- Изменено на 10000
+        game.Players.LocalPlayer.Character:MoveTo(newPosition) -- Перемещаем персонажа
+
         wait(.15)
         local Seat = Instance.new('Seat', game.Workspace)
         Seat.Anchored = false
