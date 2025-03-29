@@ -1,0 +1,885 @@
+-- Ваш первый скрипт
+local ScreenGui = Instance.new("ScreenGui")
+local buttonReborn = Instance.new("TextButton")
+local symbols = "1234567890#%_-+()/@*'\"\\;:!?×÷^√∆-+=<>[]=}{|•°π⌀¿¿¿¿¿????''’’~…§"
+
+-- Настройки ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Настройки кнопки Reborn
+buttonReborn.Size = UDim2.new(0, 100, 0, 50)
+buttonReborn.Position = UDim2.new(0.08, 0, 0.5, 0)
+buttonReborn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+buttonReborn.Text = "Reborn"
+buttonReborn.TextColor3 = Color3.fromRGB(255, 0, 0)
+buttonReborn.TextScaled = true
+buttonReborn.Parent = ScreenGui
+
+-- Функция для генерации случайного цвета
+local function getRandomColor()
+    if math.random() <= 0.65 then
+        return Color3.fromRGB(0, 0, 0)
+    else
+        local colors = {
+            Color3.fromRGB(255, 0, 0),
+            Color3.fromRGB(0, 0, 255)
+        }
+        return colors[math.random(1, #colors)]
+    end
+end
+
+-- Функция для создания окружности с символами
+local function createCircle(radius, parent, symbolCount, positionOffsetX, yOffset, symbolSize)
+    local angleStep = 360 / symbolCount
+
+    for i = 1, symbolCount do
+        local symbolLabel = Instance.new("TextLabel")
+        symbolLabel.Size = UDim2.new(0, symbolSize, 0, symbolSize)
+        symbolLabel.BackgroundTransparency = 1
+        symbolLabel.TextColor3 = getRandomColor()
+        symbolLabel.TextScaled = true
+        symbolLabel.Text = symbols:sub(math.random(1, #symbols), math.random(1, #symbols))
+        symbolLabel.Parent = parent
+
+        local angle = math.rad(angleStep * i)
+        symbolLabel.Position = UDim2.new(
+            0.5 + (radius * math.cos(angle)) / 100 + positionOffsetX,
+            0,
+            0.5 + (radius * math.sin(angle)) / 100 + yOffset,
+            0
+        )
+    end
+end
+-- Настройки окружностей
+local circleSizes = {64, 75, 85}
+local symbolCounts = {110, 140, 210}
+local positionOffsets = {-4, -3.6, -3.2}
+local yOffsets = {0.25, 0.2, 0.15}
+local symbolSizes = {25, 27, 34}
+local maxCircles = #circleSizes
+
+for i = 1, maxCircles do
+    local radius = circleSizes[i]
+    local circleFrame = Instance.new("Frame")
+    circleFrame.Size = UDim2.new(0, 130 + (i - 1) * 20, 0, 70 + (i - 1) * 20)
+    circleFrame.Position = UDim2.new(0.5, positionOffsets[i], 0.5, -(70 + (i - 1) * 20) / 2)
+    circleFrame.BackgroundTransparency = 1
+    circleFrame.Parent = ScreenGui
+    createCircle(radius, circleFrame, symbolCounts[i], positionOffsets[i], yOffsets[i], symbolSizes[i])
+end
+
+-- Музыка
+local currentSound
+local isStopped = false
+
+local function playSound(soundId, volume, playbackSpeed, parent, onEnded)
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+    end
+    currentSound = Instance.new("Sound")
+    currentSound.Parent = parent
+    currentSound.Volume = volume
+    currentSound.SoundId = soundId
+    currentSound.PlaybackSpeed = playbackSpeed
+    currentSound.Looped = false
+    currentSound:Play()
+    currentSound.Ended:Connect(onEnded)
+end
+
+-- Функция для начала плейлиста
+local function startPlaylist()
+    if isStopped then return end
+
+    playSound("rbxassetid://86726776583600", 2, 1.2, game.Players.LocalPlayer.Character.Head, function()
+        if isStopped then return end
+        playSound("rbxassetid://142376088", 1, 1, game.Players.LocalPlayer.Backpack, function()
+            if isStopped then return end
+            playSound("rbxassetid://94748704644139", 1, 1, game.Players.LocalPlayer.Backpack, function()
+                if not isStopped then
+                    startPlaylist() -- Запускаем плейлист снова, если кнопка не была нажата
+                end
+            end)
+        end)
+    end)
+end
+
+-- Запускаем плейлист
+startPlaylist()
+
+-- Обработка нажатия кнопки Reborn
+buttonReborn.MouseButton1Click:Connect(function()
+    print("Кнопка Reborn нажата!")
+    isStopped = true -- Устанавливаем флаг, чтобы остановить плейлист
+
+    -- Останавливаем текущий звук и удаляем интерфейс
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+        currentSound = nil
+    end
+    if ScreenGui then
+        ScreenGui:Destroy()
+    end
+
+    -- Запуск второго скрипта
+    local dead = true
+    local HealthTextLabel = game.Players.LocalPlayer.Character.Head.Display.Frame.Health.TextLabel
+    if dead == true then
+        local TweenService = game:GetService("TweenService")
+        local ScreenGui2 = Instance.new("ScreenGui")
+        local main = Instance.new("Frame")
+        local title = Instance.new("TextLabel")
+        local idiot = Instance.new("TextLabel")
+        local whiteScreen = Instance.new("Frame")
+        local hell = Instance.new("TextLabel")
+        ScreenGui2.Parent = game.CoreGui
+
+        -- Создание и настройка фрейма main
+        main.Name = "main"
+        main.Parent = ScreenGui2
+        main.BackgroundColor3 = Color3.new(0, 0, 0)
+        main.BorderSizePixel = 0
+        main.Position = UDim2.new(0, 0, 0, -24)
+        main.Size = UDim2.new(1, 0, 0, 0)
+        main.Visible = true
+
+        -- Создание и настройка текста "YOU'RE DEAD"
+        title.Name = "title"
+        title.Parent = main
+        title.BackgroundColor3 = Color3.new(0, 0, 0)
+        title.Size = UDim2.new(0, 0, 0, 0)
+        title.Font = Enum.Font.Arial
+        title.Text = "YOU'RE DEAD"
+        title.TextColor3 = Color3.new(139, 0, 0)
+        title.Position = UDim2.new(0.45, 0, 0.3, 0)
+        title.TextTransparency = 1
+        title.BackgroundTransparency = 1
+        title.TextSize = 100
+
+        -- Анимация фрейма main
+        local tween = TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 1, 0) })
+        tween:Play()
+
+        -- Задержка перед появлением текста "YOU'RE DEAD"
+        wait(3)
+
+        -- Анимация текста "YOU'RE DEAD"
+        tween = TweenService:Create(title, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+        tween:Play()
+
+        -- Задержка перед появлением текста "идиот"
+        wait(3)
+
+        -- Создание и настройка текста "идиот"
+        idiot.Name = "idiot"
+        idiot.Parent = main
+        idiot.BackgroundColor3 = Color3.new(0, 0, 0)
+        idiot.Size = UDim2.new(0, 0, 0, 0)
+        idiot.Font = Enum.Font.Arial
+        idiot.Text = "[ IDIOT ]"
+        idiot.TextColor3 = Color3.new(255, 0, 0)
+        idiot.Position = UDim2.new(0.45, 0, 0.5, 0)
+        idiot.TextTransparency = 1
+        idiot.BackgroundTransparency = 1
+        idiot.TextSize = 50
+
+                -- Анимация текста "идиот"
+        tween = TweenService:Create(idiot, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { TextTransparency = 0 })
+        tween:Play()
+
+        wait(5.1)
+
+        -- Создание и настройка белого экрана
+        whiteScreen.Name = "whiteScreen"
+        whiteScreen.Parent = main
+        whiteScreen.BackgroundColor3 = Color3.new(1, 1, 1)
+        whiteScreen.BorderSizePixel = 0
+        whiteScreen.Position = UDim2.new(0, 0, 0, 0)
+        whiteScreen.Size = UDim2.new(1, 0, 1, 0)
+        whiteScreen.Visible = false
+        whiteScreen.Visible = true
+
+        wait(2)
+
+        -- Удаление белого экрана, main и idiot
+        idiot:Destroy()
+        whiteScreen.BackgroundTransparency = 1
+        title.Text = "S"
+        wait(0.25)
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Character.Head
+        Sound.Volume = 150
+        Sound.Playing = true
+        Sound.Looped = false
+        Sound.SoundId = "rbxassetid://9113128037"
+        Sound.Name = "text"
+        Sound.PlaybackSpeed = 1
+        title.Text = "SY"
+        wait(0.25)
+        title.Text = "SYS"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYST"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTE"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM R"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM RE"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM REB"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM REBO"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM REBOO"
+        Sound.Playing = true
+        wait(0.25)
+        title.Text = "SYSTEM REBOOT"
+        Sound.Playing = true
+        wait(0.1)
+        Sound:Destroy()
+
+        -- Создание и настройка метки hell
+        hell.Name = "hell"
+        hell.Parent = main
+        hell.BackgroundColor3 = Color3.new(0, 0, 0)
+        hell.Size = UDim2.new(0, 0, 0, 0)
+        hell.Font = Enum.Font.Arial
+        hell.Text = ""
+        hell.TextColor3 = Color3.new(0, 255, 0)  -- Хакерски зеленый
+        hell.TextTransparency = 1
+        hell.BackgroundTransparency = 1
+        hell.TextSize = 30
+        hell.Visible = true
+
+        -- Функция для генерации случайного символа
+        local function generateRandomCharacter()
+            local characters = "@%÷×√xxxxxabcdefghijklmnopqrstuv0123456789123456789000111"
+            return characters:sub(math.random(1, #characters), math.random(1, #characters))
+        end
+
+        -- Функция для отображения случайного символа
+        local function displayRandomCharacter()
+            hell.Text = generateRandomCharacter()
+            hell.Visible = true
+            local tween = TweenService:Create(hell, TweenInfo.new(1), { TextTransparency = 0 })
+            tween:Play()
+        end
+
+        -- Событие Heartbeat, которое отображает случайные символы
+        local event = game:GetService("RunService").Heartbeat:Connect(function()
+            displayRandomCharacter()
+
+            -- Случайное перемещение метки hell на экране
+            hell.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        end)
+
+        wait(5)
+        whiteScreen.BackgroundColor3 = Color3.new(1, 1, 0)
+        tween = TweenService:Create(whiteScreen, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 })
+        tween:Play()
+
+        -- Анимация персонажа
+        local Anim = Instance.new("Animation")
+        Anim.AnimationId = "rbxassetid://13045731482"
+        local k = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+        k:Play()
+        k:AdjustSpeed(1.45)
+        wait(3)
+
+        -- Удаление объектов
+        whiteScreen:Destroy()
+        main:Destroy()
+        hell:Destroy()
+        title:Destroy()
+
+        -- Воспроизведение звука
+        -- Воспроизведение звука
+        local finalSound = Instance.new("Sound")
+        finalSound.Parent = game.Players.LocalPlayer.Character.Head
+        finalSound.Volume = 10
+        finalSound.Looped = false
+        finalSound.SoundId = "rbxassetid://642336941"
+        finalSound.Name = "text"
+        finalSound.PlaybackSpeed = 1
+        finalSound.Playing = true
+        wait(0.9)
+        finalSound:Destroy()
+
+        -- Задержка перед запуском второго скрипта
+        wait(5)
+        local Sound = Instance.new("Sound")
+        Sound.Parent = game.Players.LocalPlayer.Character.Head
+        Sound.Volume = 10 
+        Sound.Playing = true 
+        Sound.Looped = false 
+        Sound.SoundId = "rbxassetid://93086114912238" 
+        Sound.Name = "you idiot v2" 
+        Sound.PlaybackSpeed = 0.98
+        -- Второй скрипт
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        -- Создание анимаций
+        local runningAnim = Instance.new("Animation")
+        runningAnim.AnimationId = "rbxassetid://13624084239" -- Анимация при движении
+        local runningTrack = humanoid:LoadAnimation(runningAnim)
+
+        local idleAnim = Instance.new("Animation")
+        idleAnim.AnimationId = "rbxassetid://13384901306" -- Анимация при стоянии
+        local idleTrack = humanoid:LoadAnimation(idleAnim)
+    local player = game.Players.LocalPlayer
+
+    -- Функция для воспроизведения звука
+    local function playSound(soundId, volume, parent, onEnded)
+        local sound = Instance.new("Sound")
+        sound.SoundId = soundId
+        sound.Volume = volume
+        sound.Parent = parent
+        sound.Looped = false
+        sound:Play()
+
+        sound.Ended:Connect(function()
+            onEnded()
+            sound:Destroy() -- Удаляем звук после окончания
+        end)
+    end
+
+    -- Плейлист
+    local playlist = {
+        {id = "rbxassetid://1843037796", volume = 1, parent = player.Backpack},
+        {id = "rbxassetid://14145622615", volume = 1, parent = player.Backpack},
+        {id = "rbxassetid://1845022526", volume = 5, parent = player.Character.Head},
+        {id = "rbxassetid://9038618819", volume = 5, parent = player.Character.Head},
+        {id = "rbxassetid://10373823582", volume = 5, parent = player.Character.Head},
+    }
+
+    -- Функция для воспроизведения плейлиста
+    local function startPlaylist(index)
+        if index > #playlist then
+            index = 1 -- Начинаем сначала, если достигли конца
+        end
+
+        local track = playlist[index]
+        playSound(track.id, track.volume, track.parent, function()
+            startPlaylist(index + 1) -- Переходим к следующему треку
+        end)
+    end
+
+    -- Запускаем плейлист
+    startPlaylist(1)
+        -- Функция для воспроизведения анимации при движении
+        local function onRunning(speed)
+            if speed > 0 then
+                if not runningTrack.IsPlaying then
+                    idleTrack:Stop() -- Остановить анимацию стояния, если она играет
+                    runningTrack:Play() -- Воспроизвести анимацию движения
+                    runningTrack:AdjustSpeed(1) -- Установите скорость анимации
+                end
+            else
+                if runningTrack.IsPlaying then
+                    runningTrack:Stop() -- Остановить анимацию движения
+                end
+                if not idleTrack.IsPlaying then
+                    idleTrack:Play() -- Воспроизвести анимацию стояния
+                    idleTrack:AdjustSpeed(1) -- Установите скорость анимации
+                end
+            end
+        end
+    -- Создаем ScreenGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "MyGui"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Создаем основную кнопку для выбора игрока
+    local mainButton = Instance.new("TextButton")
+    mainButton.Name = "MainButton"
+    mainButton.Size = UDim2.new(0, 180, 0, 40)
+    mainButton.Position = UDim2.new(0.5, -90, 0, 10) -- Подняли кнопку выше
+    mainButton.Text = "Выберите игрока"
+    mainButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    mainButton.Parent = screenGui
+
+    -- Создаем фреймы для двух списков игроков
+    local playerListFrame1 = Instance.new("Frame")
+    playerListFrame1.Size = UDim2.new(0, 150, 0, 150)
+    playerListFrame1.Position = UDim2.new(0.3, 0, 0.1, -75) -- Подняли фрейм выше
+    playerListFrame1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    playerListFrame1.Visible = false
+    playerListFrame1.Parent = screenGui
+
+    local playerListFrame2 = Instance.new("Frame")
+    playerListFrame2.Size = UDim2.new(0, 150, 0, 150)
+    playerListFrame2.Position = UDim2.new(0.6, 0, 0.1, -75) -- Подняли фрейм выше
+    playerListFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    playerListFrame2.Visible = false
+    playerListFrame2.Parent = screenGui
+
+    -- Переменная для хранения выбранного игрока
+    local selectedPlayerName = nil
+
+    -- Функция для создания кнопки игрока
+    local function createPlayerButton(playerName, position, parentFrame)
+        local playerButton = Instance.new("TextButton")
+        playerButton.Size = UDim2.new(1, 0, 0, 25)
+        playerButton.Text = playerName
+        playerButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        playerButton.Position = UDim2.new(0, 0, position, 0)
+        playerButton.Parent = parentFrame
+
+        -- Обработка нажатия на кнопку игрока
+        playerButton.MouseButton1Click:Connect(function()
+            selectedPlayerName = playerName
+            mainButton.Text = playerName
+            playerListFrame1.Visible = false
+            playerListFrame2.Visible = false
+        end)
+    end
+
+    -- Функция для отображения списка игроков
+    local function showPlayerList()
+        for _, frame in pairs({playerListFrame1, playerListFrame2}) do
+            for _, child in pairs(frame:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child:Destroy()
+                end
+            end
+        end
+
+        local players = game.Players:GetPlayers()
+        local maxPlayers = math.min(#players, 12)
+
+        for i = 1, math.min(maxPlayers, 6) do
+            createPlayerButton(players[i].Name, (i - 1) * 0.1, playerListFrame1)
+        end
+
+        for i = 7, maxPlayers do
+            createPlayerButton(players[i].Name, (i - 7) * 0.1, playerListFrame2)
+        end
+
+        for i, child in ipairs(playerListFrame1:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Position = UDim2.new(0, 0, (i - 1) * 0.16, 0)
+            end
+        end
+
+        for i, child in ipairs(playerListFrame2:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Position = UDim2.new(0, 0, (i - 1) * 0.16, 0)
+            end
+        end
+
+        playerListFrame1.Visible = true
+        playerListFrame2.Visible = true
+    end
+
+    -- Привязка функции к событию нажатия основной кнопки
+    mainButton.MouseButton1Click:Connect(showPlayerList)
+
+    -- Соз даем первую кнопку для начала телепортации
+    local button1 = Instance.new("TextButton")
+    button1.Name = "Button1"
+    button1.Size = UDim2.new(0, 130, 0, 30)
+    button1.Position = UDim2.new(0.5, -65, 0, 50) -- Подняли кнопку выше
+    button1.Text = "Начать телепортацию"
+    button1.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    button1.Parent = screenGui
+
+    -- Создаем вторую кнопку для остановки телепортации
+    local button2 = Instance.new("TextButton")
+    button2.Name = "Button2"
+    button2.Size = UDim2.new(0, 130, 0, 30)
+    button2.Position = UDim2.new(0.5, -65, 0, 90) -- Подняли кнопку выше
+    button2.Text = "Остановить телепортацию"
+    button2.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Черный фон
+    button2.TextColor3 = Color3.fromRGB(255, 255, 255) -- Белый текст
+    button2.Parent = screenGui
+
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local radius = 60
+    local isTeleporting = false
+    local teleportCoroutine
+
+    -- Функция для получения координат прямоугольника вокруг выбранного игрока
+    local function getRectangleVertices(center, width, height)
+        local vertices = {}
+        table.insert(vertices, Vector3.new(center.X - width / 2, center.Y, center.Z - height / 2)) -- Верхний левый
+        table.insert(vertices, Vector3.new(center.X + width / 2, center.Y, center.Z - height / 2)) -- Верхний правый
+        table.insert(vertices, Vector3.new(center.X + width / 2, center.Y, center.Z + height / 2)) -- Нижний правый
+        table.insert(vertices, Vector3.new(center.X - width / 2, center.Y, center.Z + height / 2)) -- Нижний левый
+        return vertices
+    end
+
+    local function startTeleportation()
+        if not selectedPlayerName then
+            return -- Если игрок не выбран, ничего не делаем
+        end
+
+        local targetPlayer = game.Players:FindFirstChild(selectedPlayerName)
+        if not targetPlayer or not targetPlayer.Character then
+            return -- Если целевой игрок не найден или у него нет персонажа, ничего не делаем
+        end
+
+        isTeleporting = true
+        teleportCoroutine = coroutine.create(function()
+            while isTeleporting do
+                local targetHumanoidRootPart = targetPlayer.Character:WaitForChild("HumanoidRootPart")
+                local center = targetHumanoidRootPart.Position
+                local points = getRectangleVertices(center, radius, radius) -- Прямоугольник с шириной и высотой равной radius
+
+                for i = 1, #points do
+                    humanoidRootPart.Position = points[i]
+                    wait(0.001) -- Задержка между телепортациями
+                end
+            end
+        end)
+
+        coroutine.resume(teleportCoroutine)
+    end
+
+    local function stopTeleportation()
+        isTeleporting = false
+        if selectedPlayerName then
+            local targetPlayer = game.Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer and targetPlayer.Character then
+                local targetHumanoidRootPart = targetPlayer.Character:WaitForChild("HumanoidRootPart")
+                wait(0.3)
+                humanoidRootPart.Position = targetHumanoidRootPart.Position 
+            end
+        end
+    end
+
+    button1.MouseButton1Click:Connect(startTeleportation)
+    button2.MouseButton1Click:Connect(stopTeleportation)
+    local ScreenGui = Instance.new("ScreenGui")
+    local buttonForward = Instance.new("TextButton")
+    local buttonBackward = Instance.new("TextButton")
+    local buttonUp = Instance.new("TextButton")
+    local buttonDown = Instance.new("TextButton")
+    local buttonLeft = Instance.new("TextButton")
+    local buttonRight = Instance.new("TextButton")
+    local buttonFell = Instance.new("TextButton")
+    local buttonFellDown = Instance.new("TextButton")
+    local statusLabelFell = Instance.new("TextLabel")
+    local statusLabelFellDown = Instance.new("TextLabel")
+
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    local initialUpDistance = 50
+    local initialDownDistance = 50
+    local initialSideDistance = 60
+    local initialForwardCompensation = 60
+    local initialForwardDistance = 75
+    local initialBackwardDistance = 60
+
+    local upDistance = initialUpDistance
+    local downDistance = initialDownDistance
+    local sideDistance = initialSideDistance
+    local forwardCompensation = initialForwardCompensation
+    local forwardDistance = initialForwardDistance
+    local backwardDistance = initialBackwardDistance
+
+    local isFellActive = false
+    local isFellDownActive = false
+
+    buttonUp.Size = UDim2.new(0, 50, 0, 50)
+    buttonUp.Position = UDim2.new(0.1, 0, 0.1, 0)
+    buttonUp.BackgroundColor3 = Color3.fromRGB(0,0, 0)
+    buttonUp.Text = "^"
+    buttonUp.TextColor3 = Color3.fromRGB(255,0,0)
+    buttonUp.TextScaled = true
+    buttonUp.Parent = ScreenGui
+
+    buttonDown.Size = UDim2.new(0, 50, 0, 50)
+    buttonDown.Position = UDim2.new(0.2, 0, 0.1, 0)
+    buttonDown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonDown.Text = "v"
+    buttonDown.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonDown.TextScaled = true
+    buttonDown.Parent = ScreenGui
+
+    buttonLeft.Size = UDim2.new(0, 50, 0, 50)
+    buttonLeft.Position = UDim2.new(0.1, 0, 0.2, 0)
+    buttonLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonLeft.Text = "<"
+    buttonLeft.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonLeft.TextScaled = true
+    buttonLeft.Parent = ScreenGui
+
+    buttonRight.Size = UDim2.new(0, 50, 0, 50)
+    buttonRight.Position = UDim2.new(0.2, 0, 0.2, 0)
+    buttonRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonRight.Text = ">"
+    buttonRight.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonRight.TextScaled = true
+    buttonRight.Parent = ScreenGui
+
+    buttonForward.Size = UDim2.new(0, 50, 0, 50)
+    buttonForward.Position = UDim2.new(0.15, 0, 0.15, 0)
+    buttonForward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonForward.Text = "rush"
+    buttonForward.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonForward.TextScaled = true
+    buttonForward.Parent = ScreenGui
+
+    buttonBackward.Size = UDim2.new(0, 50, 0, 50)
+    buttonBackward.Position = UDim2.new(0.15, 0, 0.25, 0)
+    buttonBackward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonBackward.Text = "back"
+    buttonBackward.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonBackward.TextScaled = true
+    buttonBackward.Parent = ScreenGui
+
+    buttonFell.Size = UDim2.new(0, 100, 0, 50)
+    buttonFell.Position = UDim2.new(0.15, 0, 0.5, 0)
+    buttonFell.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+    buttonFell.Text = "Fell"
+    buttonFell.TextColor3 = Color3.fromRGB(255, 255, 255)
+    buttonFell.TextScaled = true
+    buttonFell.Parent = ScreenGui
+
+    buttonFellDown.Size = UDim2.new(0, 100, 0, 50)
+    buttonFellDown.Position = UDim2.new(0.15, 0, 0.6, 0)
+    buttonFellDown.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
+    buttonFellDown.Text = "Fell Down"
+    buttonFellDown.TextColor3 = Color3.fromRGB(255, 255, 255)
+    buttonFellDown.TextScaled = true
+    buttonFellDown.Parent = ScreenGui
+
+    statusLabelFell.Size = UDim2.new(0, 200, 0, 50)
+    statusLabelFell.Position = UDim2.new(0.08, 0, 0.0008, 0)
+    statusLabelFell.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabelFell.TextColor3 = Color3.fromRGB(0, 0, 0)
+    statusLabelFell.TextScaled = true
+    statusLabelFell.Text = "Fell is inactive"
+    statusLabelFell.Parent = ScreenGui
+
+    statusLabelFellDown.Size = UDim2.new(0, 200, 0, 50)
+    statusLabelFellDown.Position = UDim2.new(0.08, 0, 0.35, 0)
+    statusLabelFellDown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabelFellDown.TextColor3 = Color3.fromRGB(0, 0, 0)
+    statusLabelFellDown.TextScaled = true
+    statusLabelFellDown.Text = "Fell Down is inactive"
+    statusLabelFellDown.Parent = ScreenGui
+
+    local function toggleFell()
+        if isFellActive then
+            upDistance = initialUpDistance
+            downDistance = initialDownDistance
+            sideDistance = initialSideDistance
+            forwardCompensation = initialForwardCompensation
+            forwardDistance = initialForwardDistance
+            backwardDistance = initialBackwardDistance
+            statusLabelFell.Text = "Fell is inactive"
+        else
+            upDistance = upDistance * 2
+            downDistance = downDistance * 2
+            sideDistance = sideDistance * 2
+            forwardCompensation = forwardCompensation * 2
+            forwardDistance = forwardDistance * 2
+            backwardDistance = backwardDistance * 2
+            statusLabelFell.Text = "Fell is active"
+        end
+
+        isFellActive = not isFellActive
+
+        if isFellDownActive then
+            toggleFellDown()
+        end
+    end
+
+    local function toggleFellDown()
+        if isFellDownActive then
+            upDistance = initialUpDistance
+            downDistance = initialDownDistance
+            sideDistance = initialSideDistance
+            forwardCompensation = initialForwardCompensation
+            forwardDistance = initialForwardDistance
+            backwardDistance = initialBackwardDistance
+            statusLabelFellDown.Text = "Fell Down is inactive"
+        else
+            upDistance = upDistance * 10
+            downDistance = downDistance * 10
+            sideDistance = sideDistance * 10
+            forwardCompensation = forwardCompensation * 10
+            forwardDistance = forwardDistance * 10
+            backwardDistance = backwardDistance * 10
+            statusLabelFellDown.Text = "Fell Down is active"
+        end
+
+        isFellDownActive = not isFellDownActive
+
+        if isFellActive then
+            toggleFell()
+        end
+    end
+
+    local function teleport(direction)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = player.Character.HumanoidRootPart
+
+            if direction == "up" then
+                humanoidRootPart.Position = humanoidRootPart.Position + Vector3.new(0, upDistance, 0)
+            elseif direction == "down" then
+                humanoidRootPart.Position = humanoidRootPart.Position - Vector3.new(0, downDistance, 0)
+            elseif direction ==  "left" then
+                humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+            elseif direction == "right" then
+                humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+            elseif direction == "forward" then
+                humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.LookVector * forwardDistance
+            elseif direction == "backward" then
+                humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.LookVector * backwardDistance
+            end
+        else
+            warn("Персонаж не найден!")
+        end
+    end
+
+    buttonUp.MouseButton1Click:Connect(function()
+        teleport("up")
+    end)
+
+    buttonDown.MouseButton1Click:Connect(function()
+        teleport("down")
+    end)
+
+    buttonLeft.MouseButton1Click:Connect(function()
+        teleport("left")
+    end)
+
+    buttonRight.MouseButton1Click:Connect(function()
+        teleport("right")
+    end)
+
+    buttonForward.MouseButton1Click:Connect(function()
+        teleport("forward")
+    end)
+
+    buttonBackward.MouseButton1Click:Connect(function()
+        teleport("backward")
+    end)
+
+    buttonFell.MouseButton1Click:Connect(function()
+        toggleFell()
+    end)
+
+    buttonFellDown.MouseButton1Click:Connect(function()
+        toggleFellDown()
+    end)
+    local key = Enum.KeyCode.X -- key to toggle invisibility
+
+    --// dont edit script below
+    local invis_on = false
+
+    local player = game.Players.LocalPlayer
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    local frame = Instance.new("Frame", screenGui)
+    local toggleButton = Instance.new("TextButton", frame)
+
+    frame.Size = UDim2.new(0, 110, 0, 50)
+    frame.Position = UDim2.new(0.5, 400, 0.5, -350)
+    frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    frame.Active = true
+
+    toggleButton.Size = UDim2.new(0, 100, 0, 40)
+    toggleButton.Position = UDim2.new(0, 5, 0, 5)
+    toggleButton.Text = "Surprise"
+    toggleButton.BackgroundColor3 = Color3.fromRGB(128, 0, 255)
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 0)
+    toggleButton.Font = Enum.Font.SourceSans
+    toggleButton.TextSize = 24
+
+    toggleButton.TextStrokeTransparency = 0.5
+    toggleButton.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+
+    local sound = Instance.new("Sound", player:WaitForChild("PlayerGui"))
+    sound.SoundId = "rbxassetid://942127495"
+    sound.Volume = 1
+
+    local function setTransparency(character, transparency)
+        for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("Decal") then
+                part.Transparency = transparency
+            end
+        end
+    end
+
+    local function toggleInvisibility()
+        invis_on = not invis_on
+        sound:Play()
+        if invis_on then
+            local savedpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+            wait()
+
+            local newPosition = savedpos.Position - (savedpos.LookVector * 10000)
+            game.Players.LocalPlayer.Character:MoveTo(newPosition)
+
+            wait(.15)
+            local Seat = Instance.new('Seat', game.Workspace)
+            Seat.Anchored = false
+            Seat.CanCollide = false
+            Seat.Name = 'invischair'
+            Seat.Transparency = 1
+            Seat.Position = Vector3.new(-25.95, 84, 35370.55)
+            local Weld = Instance.new("Weld", Seat)
+            Weld.Part0 = Seat
+            Weld.Part1 = game.Players.LocalPlayer.Character:FindFirstChild("Torso") or game.Players.LocalPlayer.Character.UpperTorso
+            wait()
+            Seat.CFrame = savedpos
+            setTransparency(game.Players.LocalPlayer.Character, 0.5)
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Invis On";
+                Duration = 1;
+                Text = "";
+            })
+        else
+            local invisChair = workspace:FindFirstChild('invischair')
+            if invisChair then
+                invisChair:Destroy()
+            end
+            setTransparency(game.Players.LocalPlayer.Character, 0)
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Invis Off";
+                Duration = 1;
+                Text = "";
+            })
+        end
+    end
+
+    toggleButton.MouseButton1Click:Connect(toggleInvisibility)
+
+    local function closeMenu()
+        frame.Visible = false
+    end
+
+    -- closeButton.MouseButton1Click:Connect(closeMenu)
+        -- Подключение к событию Running
+        humanoid.Running:Connect(onRunning)
+
+        -- Обработка ситуации, когда персонаж умирает
+        character.Humanoid.Died:Connect(function()
+            if runningTrack.IsPlaying then
+                runningTrack:Stop()
+            end
+            if idleTrack.IsPlaying then
+                idleTrack:Stop()
+            end
+        end)
+    end
+end)
+
