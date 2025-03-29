@@ -358,9 +358,9 @@ buttonReborn.MouseButton1Click:Connect(function()
 
     -- Плейлист
     local playlist = {
+        {id = "rbxassetid://1843037796", volume = 1, parent = player.Backpack},
         {id = "rbxassetid://14145622615", volume = 1, parent = player.Backpack},
-        {id = "rbxassetid://1845022526", volume = 1, parent = player.Backpack},
-        {id = "rbxassetid://1843037796", volume = 5, parent = player.Character.Head},
+        {id = "rbxassetid://1845022526", volume = 5, parent = player.Character.Head},
         {id = "rbxassetid://9038618819", volume = 5, parent = player.Character.Head},
         {id = "rbxassetid://10373823582", volume = 5, parent = player.Character.Head},
     }
@@ -397,6 +397,390 @@ buttonReborn.MouseButton1Click:Connect(function()
                 end
             end
         end
+    -- Создаем ScreenGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "MyGui"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Создаем основную кнопку для выбора игрока
+    local mainButton = Instance.new("TextButton")
+    mainButton.Name = "MainButton"
+    mainButton.Size = UDim2.new(0, 180, 0, 40)
+    mainButton.Position = UDim2.new(0.5, -90, 0, 10) -- Подняли кнопку выше
+    mainButton.Text = "Выберите игрока"
+    mainButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    mainButton.Parent = screenGui
+
+    -- Создаем фреймы для двух списков игроков
+    local playerListFrame1 = Instance.new("Frame")
+    playerListFrame1.Size = UDim2.new(0, 150, 0, 150)
+    playerListFrame1.Position = UDim2.new(0.3, 0, 0.1, -75) -- Подняли фрейм выше
+    playerListFrame1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    playerListFrame1.Visible = false
+    playerListFrame1.Parent = screenGui
+
+    local playerListFrame2 = Instance.new("Frame")
+    playerListFrame2.Size = UDim2.new(0, 150, 0, 150)
+    playerListFrame2.Position = UDim2.new(0.6, 0, 0.1, -75) -- Подняли фрейм выше
+    playerListFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    playerListFrame2.Visible = false
+    playerListFrame2.Parent = screenGui
+
+    -- Переменная для хранения выбранного игрока
+    local selectedPlayerName = nil
+
+    -- Функция для создания кнопки игрока
+    local function createPlayerButton(playerName, position, parentFrame)
+        local playerButton = Instance.new("TextButton")
+        playerButton.Size = UDim2.new(1, 0, 0, 25)
+        playerButton.Text = playerName
+        playerButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        playerButton.Position = UDim2.new(0, 0, position, 0)
+        playerButton.Parent = parentFrame
+
+        -- Обработка нажатия на кнопку игрока
+        playerButton.MouseButton1Click:Connect(function()
+            selectedPlayerName = playerName
+            mainButton.Text = playerName
+            playerListFrame1.Visible = false
+            playerListFrame2.Visible = false
+        end)
+    end
+
+    -- Функция для отображения списка игроков
+    local function showPlayerList()
+        for _, frame in pairs({playerListFrame1, playerListFrame2}) do
+            for _, child in pairs(frame:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child:Destroy()
+                end
+            end
+        end
+
+        local players = game.Players:GetPlayers()
+        local maxPlayers = math.min(#players, 12)
+
+        for i = 1, math.min(maxPlayers, 6) do
+            createPlayerButton(players[i].Name, (i - 1) * 0.1, playerListFrame1)
+        end
+
+        for i = 7, maxPlayers do
+            createPlayerButton(players[i].Name, (i - 7) * 0.1, playerListFrame2)
+        end
+
+        for i, child in ipairs(playerListFrame1:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Position = UDim2.new(0, 0, (i - 1) * 0.16, 0)
+            end
+        end
+
+        for i, child in ipairs(playerListFrame2:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Position = UDim2.new(0, 0, (i - 1) * 0.16, 0)
+            end
+        end
+
+        playerListFrame1.Visible = true
+        playerListFrame2.Visible = true
+    end
+
+    -- Привязка функции к событию нажатия основной кнопки
+    mainButton.MouseButton1Click:Connect(showPlayerList)
+
+    -- Соз даем первую кнопку для начала телепортации
+    local button1 = Instance.new("TextButton")
+    button1.Name = "Button1"
+    button1.Size = UDim2.new(0, 130, 0, 30)
+    button1.Position = UDim2.new(0.5, -65, 0, 50) -- Подняли кнопку выше
+    button1.Text = "Начать телепортацию"
+    button1.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    button1.Parent = screenGui
+
+    -- Создаем вторую кнопку для остановки телепортации
+    local button2 = Instance.new("TextButton")
+    button2.Name = "Button2"
+    button2.Size = UDim2.new(0, 130, 0, 30)
+    button2.Position = UDim2.new(0.5, -65, 0, 90) -- Подняли кнопку выше
+    button2.Text = "Остановить телепортацию"
+    button2.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Черный фон
+    button2.TextColor3 = Color3.fromRGB(255, 255, 255) -- Белый текст
+    button2.Parent = screenGui
+
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local radius = 60
+    local isTeleporting = false
+    local teleportCoroutine
+
+    -- Функция для получения координат прямоугольника вокруг выбранного игрока
+    local function getRectangleVertices(center, width, height)
+        local vertices = {}
+        table.insert(vertices, Vector3.new(center.X - width / 2, center.Y, center.Z - height / 2)) -- Верхний левый
+        table.insert(vertices, Vector3.new(center.X + width / 2, center.Y, center.Z - height / 2)) -- Верхний правый
+        table.insert(vertices, Vector3.new(center.X + width / 2, center.Y, center.Z + height / 2)) -- Нижний правый
+        table.insert(vertices, Vector3.new(center.X - width / 2, center.Y, center.Z + height / 2)) -- Нижний левый
+        return vertices
+    end
+
+    local function startTeleportation()
+        if not selectedPlayerName then
+            return -- Если игрок не выбран, ничего не делаем
+        end
+
+        local targetPlayer = game.Players:FindFirstChild(selectedPlayerName)
+        if not targetPlayer or not targetPlayer.Character then
+            return -- Если целевой игрок не найден или у него нет персонажа, ничего не делаем
+        end
+
+        isTeleporting = true
+        teleportCoroutine = coroutine.create(function()
+            while isTeleporting do
+                local targetHumanoidRootPart = targetPlayer.Character:WaitForChild("HumanoidRootPart")
+                local center = targetHumanoidRootPart.Position
+                local points = getRectangleVertices(center, radius, radius) -- Прямоугольник с шириной и высотой равной radius
+
+                for i = 1, #points do
+                    humanoidRootPart.Position = points[i]
+                    wait(0.001) -- Задержка между телепортациями
+                end
+            end
+        end)
+
+        coroutine.resume(teleportCoroutine)
+    end
+
+    local function stopTeleportation()
+        isTeleporting = false
+        if selectedPlayerName then
+            local targetPlayer = game.Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer and targetPlayer.Character then
+                local targetHumanoidRootPart = targetPlayer.Character:WaitForChild("HumanoidRootPart")
+                wait(0.3)
+                humanoidRootPart.Position = targetHumanoidRootPart.Position 
+            end
+        end
+    end
+
+    button1.MouseButton1Click:Connect(startTeleportation)
+    button2.MouseButton1Click:Connect(stopTeleportation)
+    local ScreenGui = Instance.new("ScreenGui")
+    local buttonForward = Instance.new("TextButton")
+    local buttonBackward = Instance.new("TextButton")
+    local buttonUp = Instance.new("TextButton")
+    local buttonDown = Instance.new("TextButton")
+    local buttonLeft = Instance.new("TextButton")
+    local buttonRight = Instance.new("TextButton")
+    local buttonFell = Instance.new("TextButton")
+    local buttonFellDown = Instance.new("TextButton")
+    local statusLabelFell = Instance.new("TextLabel")
+    local statusLabelFellDown = Instance.new("TextLabel")
+
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    local initialUpDistance = 50
+    local initialDownDistance = 50
+    local initialSideDistance = 60
+    local initialForwardCompensation = 60
+    local initialForwardDistance = 75
+    local initialBackwardDistance = 60
+
+    local upDistance = initialUpDistance
+    local downDistance = initialDownDistance
+    local sideDistance = initialSideDistance
+    local forwardCompensation = initialForwardCompensation
+    local forwardDistance = initialForwardDistance
+    local backwardDistance = initialBackwardDistance
+
+    local isFellActive = false
+    local isFellDownActive = false
+
+    buttonUp.Size = UDim2.new(0, 50, 0, 50)
+    buttonUp.Position = UDim2.new(0.1, 0, 0.1, 0)
+    buttonUp.BackgroundColor3 = Color3.fromRGB(0,0, 0)
+    buttonUp.Text = "^"
+    buttonUp.TextColor3 = Color3.fromRGB(255,0,0)
+    buttonUp.TextScaled = true
+    buttonUp.Parent = ScreenGui
+
+    buttonDown.Size = UDim2.new(0, 50, 0, 50)
+    buttonDown.Position = UDim2.new(0.2, 0, 0.1, 0)
+    buttonDown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonDown.Text = "v"
+    buttonDown.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonDown.TextScaled = true
+    buttonDown.Parent = ScreenGui
+
+    buttonLeft.Size = UDim2.new(0, 50, 0, 50)
+    buttonLeft.Position = UDim2.new(0.1, 0, 0.2, 0)
+    buttonLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonLeft.Text = "<"
+    buttonLeft.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonLeft.TextScaled = true
+    buttonLeft.Parent = ScreenGui
+
+    buttonRight.Size = UDim2.new(0, 50, 0, 50)
+    buttonRight.Position = UDim2.new(0.2, 0, 0.2, 0)
+    buttonRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonRight.Text = ">"
+    buttonRight.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonRight.TextScaled = true
+    buttonRight.Parent = ScreenGui
+
+    buttonForward.Size = UDim2.new(0, 50, 0, 50)
+    buttonForward.Position = UDim2.new(0.15, 0, 0.15, 0)
+    buttonForward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonForward.Text = "rush"
+    buttonForward.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonForward.TextScaled = true
+    buttonForward.Parent = ScreenGui
+
+    buttonBackward.Size = UDim2.new(0, 50, 0, 50)
+    buttonBackward.Position = UDim2.new(0.15, 0, 0.25, 0)
+    buttonBackward.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    buttonBackward.Text = "back"
+    buttonBackward.TextColor3 = Color3.fromRGB(255, 0, 0)
+    buttonBackward.TextScaled = true
+    buttonBackward.Parent = ScreenGui
+
+    buttonFell.Size = UDim2.new(0, 100, 0, 50)
+    buttonFell.Position = UDim2.new(0.15, 0, 0.5, 0)
+    buttonFell.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+    buttonFell.Text = "Fell"
+    buttonFell.TextColor3 = Color3.fromRGB(255, 255, 255)
+    buttonFell.TextScaled = true
+    buttonFell.Parent = ScreenGui
+
+    buttonFellDown.Size = UDim2.new(0, 100, 0, 50)
+    buttonFellDown.Position = UDim2.new(0.15, 0, 0.6, 0)
+    buttonFellDown.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
+    buttonFellDown.Text = "Fell Down"
+    buttonFellDown.TextColor3 = Color3.fromRGB(255, 255, 255)
+    buttonFellDown.TextScaled = true
+    buttonFellDown.Parent = ScreenGui
+
+    statusLabelFell.Size = UDim2.new(0, 200, 0, 50)
+    statusLabelFell.Position = UDim2.new(0.25, 0, 0.008, 0)
+    statusLabelFell.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabelFell.TextColor3 = Color3.fromRGB(0, 0, 0)
+    statusLabelFell.TextScaled = true
+    statusLabelFell.Text = "Fell is inactive"
+    statusLabelFell.Parent = ScreenGui
+
+    statusLabelFellDown.Size = UDim2.new(0, 200, 0, 50)
+    statusLabelFellDown.Position = UDim2.new(0.25, 0, 0.09, 0)
+    statusLabelFellDown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabelFellDown.TextColor3 = Color3.fromRGB(0, 0, 0)
+    statusLabelFellDown.TextScaled = true
+    statusLabelFellDown.Text = "Fell Down is inactive"
+    statusLabelFellDown.Parent = ScreenGui
+
+    local function toggleFell()
+        if isFellActive then
+            upDistance = initialUpDistance
+            downDistance = initialDownDistance
+            sideDistance = initialSideDistance
+            forwardCompensation = initialForwardCompensation
+            forwardDistance = initialForwardDistance
+            backwardDistance = initialBackwardDistance
+            statusLabelFell.Text = "Fell is inactive"
+        else
+            upDistance = upDistance * 2
+            downDistance = downDistance * 2
+            sideDistance = sideDistance * 2
+            forwardCompensation = forwardCompensation * 2
+            forwardDistance = forwardDistance * 2
+            backwardDistance = backwardDistance * 2
+            statusLabelFell.Text = "Fell is active"
+        end
+
+        isFellActive = not isFellActive
+
+        if isFellDownActive then
+            toggleFellDown()
+        end
+    end
+
+    local function toggleFellDown()
+        if isFellDownActive then
+            upDistance = initialUpDistance
+            downDistance = initialDownDistance
+            sideDistance = initialSideDistance
+            forwardCompensation = initialForwardCompensation
+            forwardDistance = initialForwardDistance
+            backwardDistance = initialBackwardDistance
+            statusLabelFellDown.Text = "Fell Down is inactive"
+        else
+            upDistance = upDistance * 10
+            downDistance = downDistance * 10
+            sideDistance = sideDistance * 10
+            forwardCompensation = forwardCompensation * 10
+            forwardDistance = forwardDistance * 10
+            backwardDistance = backwardDistance * 10
+            statusLabelFellDown.Text = "Fell Down is active"
+        end
+
+        isFellDownActive = not isFellDownActive
+
+        if isFellActive then
+            toggleFell()
+        end
+    end
+
+    local function teleport(direction)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = player.Character.HumanoidRootPart
+
+            if direction == "up" then
+                humanoidRootPart.Position = humanoidRootPart.Position + Vector3.new(0, upDistance, 0)
+            elseif direction == "down" then
+                humanoidRootPart.Position = humanoidRootPart.Position - Vector3.new(0, downDistance, 0)
+            elseif direction ==  "left" then
+                humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+            elseif direction == "right" then
+                humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.RightVector * sideDistance + humanoidRootPart.CFrame.LookVector * forwardCompensation
+            elseif direction == "forward" then
+                humanoidRootPart.Position = humanoidRootPart.Position + humanoidRootPart.CFrame.LookVector * forwardDistance
+            elseif direction == "backward" then
+                humanoidRootPart.Position = humanoidRootPart.Position - humanoidRootPart.CFrame.LookVector * backwardDistance
+            end
+        else
+            warn("Персонаж не найден!")
+        end
+    end
+
+    buttonUp.MouseButton1Click:Connect(function()
+        teleport("up")
+    end)
+
+    buttonDown.MouseButton1Click:Connect(function()
+        teleport("down")
+    end)
+
+    buttonLeft.MouseButton1Click:Connect(function()
+        teleport("left")
+    end)
+
+    buttonRight.MouseButton1Click:Connect(function()
+        teleport("right")
+    end)
+
+    buttonForward.MouseButton1Click:Connect(function()
+        teleport("forward")
+    end)
+
+    buttonBackward.MouseButton1Click:Connect(function()
+        teleport("backward")
+    end)
+
+    buttonFell.MouseButton1Click:Connect(function()
+        toggleFell()
+    end)
+
+    buttonFellDown.MouseButton1Click:Connect(function()
+        toggleFellDown()
+    end)
         -- Подключение к событию Running
         humanoid.Running:Connect(onRunning)
 
