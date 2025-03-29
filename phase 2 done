@@ -868,6 +868,13 @@ buttonReborn.MouseButton1Click:Connect(function()
     end
 
     -- closeButton.MouseButton1Click:Connect(closeMenu)
+    nsk = Instance.new("Sky", game.Lighting)
+    nsk.SkyboxBk = "rbxassetid://602426244"
+    nsk.SkyboxDn = "rbxassetid://602426244"
+    nsk.SkyboxFt = "rbxassetid://602426244"
+    nsk.SkyboxLf = "rbxassetid://602426244"
+    nsk.SkyboxRt = "rbxassetid://602426244"
+    nsk.SkyboxUp = "rbxassetid://602426244"
         -- Подключение к событию Running
         humanoid.Running:Connect(onRunning)
 
