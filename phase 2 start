@@ -339,7 +339,46 @@ buttonReborn.MouseButton1Click:Connect(function()
         local idleAnim = Instance.new("Animation")
         idleAnim.AnimationId = "rbxassetid://13384901306" -- Анимация при стоянии
         local idleTrack = humanoid:LoadAnimation(idleAnim)
+    local player = game.Players.LocalPlayer
 
+    -- Функция для воспроизведения звука
+    local function playSound(soundId, volume, parent, onEnded)
+        local sound = Instance.new("Sound")
+        sound.SoundId = soundId
+        sound.Volume = volume
+        sound.Parent = parent
+        sound.Looped = false
+        sound:Play()
+
+        sound.Ended:Connect(function()
+            onEnded()
+            sound:Destroy() -- Удаляем звук после окончания
+        end)
+    end
+
+    -- Плейлист
+    local playlist = {
+        {id = "rbxassetid://14145622615", volume = 1, parent = player.Backpack},
+        {id = "rbxassetid://1845022526", volume = 1, parent = player.Backpack},
+        {id = "rbxassetid://1843037796", volume = 5, parent = player.Character.Head},
+        {id = "rbxassetid://9038618819", volume = 5, parent = player.Character.Head},
+        {id = "rbxassetid://10373823582", volume = 5, parent = player.Character.Head},
+    }
+
+    -- Функция для воспроизведения плейлиста
+    local function startPlaylist(index)
+        if index > #playlist then
+            index = 1 -- Начинаем сначала, если достигли конца
+        end
+
+        local track = playlist[index]
+        playSound(track.id, track.volume, track.parent, function()
+            startPlaylist(index + 1) -- Переходим к следующему треку
+        end)
+    end
+
+    -- Запускаем плейлист
+    startPlaylist(1)
         -- Функция для воспроизведения анимации при движении
         local function onRunning(speed)
             if speed > 0 then
@@ -358,7 +397,6 @@ buttonReborn.MouseButton1Click:Connect(function()
                 end
             end
         end
-
         -- Подключение к событию Running
         humanoid.Running:Connect(onRunning)
 
