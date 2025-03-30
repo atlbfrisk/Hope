@@ -68,6 +68,14 @@ for i = 1, maxCircles do
     createCircle(radius, circleFrame, symbolCounts[i], positionOffsets[i], yOffsets[i], symbolSizes[i])
 end
 
+nsk = Instance.new("Sky", game.Lighting)
+nsk.SkyboxBk = "rbxassetid://602426244"
+nsk.SkyboxDn = "rbxassetid://602426244"
+nsk.SkyboxFt = "rbxassetid://602426244"
+nsk.SkyboxLf = "rbxassetid://602426244"
+nsk.SkyboxRt = "rbxassetid://602426244"
+nsk.SkyboxUp = "rbxassetid://602426244"
+
 -- Музыка
 local currentSound
 local isStopped = false
@@ -869,12 +877,12 @@ buttonReborn.MouseButton1Click:Connect(function()
 
     -- closeButton.MouseButton1Click:Connect(closeMenu)
     nsk = Instance.new("Sky", game.Lighting)
-    nsk.SkyboxBk = "rbxassetid://602426244"
-    nsk.SkyboxDn = "rbxassetid://602426244"
-    nsk.SkyboxFt = "rbxassetid://602426244"
-    nsk.SkyboxLf = "rbxassetid://602426244"
-    nsk.SkyboxRt = "rbxassetid://602426244"
-    nsk.SkyboxUp = "rbxassetid://602426244"
+    nsk.SkyboxBk = "rbxassetid://14071196"
+    nsk.SkyboxDn = "rbxassetid://14071196"
+    nsk.SkyboxFt = "rbxassetid://14071196"
+    nsk.SkyboxLf = "rbxassetid://14071196"
+    nsk.SkyboxRt = "rbxassetid://14071196"
+    nsk.SkyboxUp = "rbxassetid://14071196"
         -- Подключение к событию Running
         humanoid.Running:Connect(onRunning)
 
