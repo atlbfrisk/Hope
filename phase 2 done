@@ -896,14 +896,14 @@ buttonReborn.MouseButton1Click:Connect(function()
             -- Создаем объект PointLight
             local glow = Instance.new("PointLight")
             glow.Color = color -- Устанавливаем цвет
-            glow.Range = 200 -- Радиус света
-            glow.Brightness = 500 -- Яркость света
+            glow.Range = 100 -- Радиус света
+            glow.Brightness = 350 -- Яркость света
             glow.Enabled = false -- Изначально выключен
             glow.Parent = humanoidRootPart
 
             -- Включаем и выключаем свет
             glow.Enabled = true
-            wait(1) -- Светит 1 секунду
+            wait(0.7) -- Светит 1 секунду
             glow.Enabled = false
         end
     end
@@ -919,11 +919,93 @@ buttonReborn.MouseButton1Click:Connect(function()
         end
 
         -- Запускаем следующую активацию через 4 секунды
-        delay(4, randomGlowEffect)
+        delay(6, randomGlowEffect)
     end
 
     -- Запускаем первый эффект
     randomGlowEffect()
+    -- Made By InfinityMercury
+    _G.Disabled = true
+
+    local tailLength = 10 -- Длина хвоста в секундах
+    local segmentLifetime = 4.5 -- Время жизни каждого сегмента
+
+    local function createTailSegment(position, color)
+        local tailSegment = Instance.new("Part")
+        tailSegment.Size = Vector3.new(0.65, 0.65, 0.65) -- Размер сегмента хвоста
+        tailSegment.Position = position
+        tailSegment.Anchored = true
+        tailSegment.CanCollide = false
+        tailSegment.Material = "Neon"
+        tailSegment.Transparency = 0.02 -- Прозрачность сегмента
+        tailSegment.BrickColor = BrickColor.new(color) -- Устанавливаем цвет сегмента
+        tailSegment.Parent = workspace -- Добавляем сегмент в рабочую область
+
+        -- Удаляем сегмент через 1 секунду
+        game:GetService("Debris"):AddItem(tailSegment, segmentLifetime)
+    end
+
+    game:GetService('RunService').RenderStepped:connect(function()
+        if _G.Disabled then
+            local player = game:GetService('Players').LocalPlayer
+            local character = player.Character
+
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local position = character.HumanoidRootPart.Position
+                position = Vector3.new(position.X, position.Y - 2.8, position.Z) -- Немного опускаем хвост
+
+                -- Создаем хвост
+                createTailSegment(position, "Really red") -- Центральный сегмент
+
+                -- Создаем синие сегменты по краям
+                createTailSegment(position + Vector3.new(0, 0, -1), "Bright blue") -- Сегмент сзади
+                createTailSegment(position + Vector3.new(0, 0, 1), "Bright blue") -- Сегмент спереди
+            end
+        end
+    end)
+    -- Made By InfinityMercury
+    _G.Disabled = true
+
+    local player = game.Players.LocalPlayer
+    local chatLabel = player.Character.Head.Chat.TextLabel
+
+    local colors = {
+        Color3.fromRGB(255, 0, 0), -- Красный цвет
+        Color3.fromRGB(0, 0, 255),
+        Color3.fromRGB(0, 0, 225),
+        Color3.fromRGB(0, 0, 200),
+        Color3.fromRGB(0, 0, 175),
+        Color3.fromRGB(0, 0, 150),
+        Color3.fromRGB(0, 0, 125),
+        Color3.fromRGB(0, 0, 100),
+        Color3.fromRGB(0, 0, 75),
+        Color3.fromRGB(0, 0, 50),
+        Color3.fromRGB(0, 0, 25),
+        Color3.fromRGB(0, 0, 0),
+        Color3.fromRGB(0, 0, 25),
+        Color3.fromRGB(0, 0, 50),
+        Color3.fromRGB(0, 0, 75),
+        Color3.fromRGB(0, 0, 100),
+        Color3.fromRGB(0, 0, 125),
+        Color3.fromRGB(0, 0, 150),
+        Color3.fromRGB(0, 0, 175),
+        Color3.fromRGB(0, 0, 200),
+        Color3.fromRGB(0, 0, 225),
+    }
+
+    local function setColor(index)
+        if index > #colors then
+            index = 1 -- Сброс индекса, чтобы начать с первого цвета
+        end
+
+        chatLabel.TextColor3 = colors[index]
+
+        -- Запускаем следующий цвет через 0.25 секунды
+        delay(0.25, function() setColor(index + 1) end)
+    end
+
+    -- Запускаем функцию с первого цвета
+    setColor(1)
         -- Подключение к событию Running
         humanoid.Running:Connect(onRunning)
 
