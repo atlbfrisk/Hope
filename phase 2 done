@@ -896,14 +896,14 @@ buttonReborn.MouseButton1Click:Connect(function()
             -- Создаем объект PointLight
             local glow = Instance.new("PointLight")
             glow.Color = color -- Устанавливаем цвет
-            glow.Range = 100 -- Радиус света
-            glow.Brightness = 350 -- Яркость света
+            glow.Range = 30 -- Радиус света
+            glow.Brightness = 150 -- Яркость света
             glow.Enabled = false -- Изначально выключен
             glow.Parent = humanoidRootPart
 
             -- Включаем и выключаем свет
             glow.Enabled = true
-            wait(0.7) -- Светит 1 секунду
+            wait(0.4) -- Светит 1 секунду
             glow.Enabled = false
         end
     end
@@ -919,7 +919,7 @@ buttonReborn.MouseButton1Click:Connect(function()
         end
 
         -- Запускаем следующую активацию через 4 секунды
-        delay(6, randomGlowEffect)
+        delay(10, randomGlowEffect)
     end
 
     -- Запускаем первый эффект
@@ -928,7 +928,7 @@ buttonReborn.MouseButton1Click:Connect(function()
     _G.Disabled = true
 
     local tailLength = 10 -- Длина хвоста в секундах
-    local segmentLifetime = 4.5 -- Время жизни каждого сегмента
+    local segmentLifetime = 10 -- Время жизни каждого сегмента
 
     local function createTailSegment(position, color)
         local tailSegment = Instance.new("Part")
