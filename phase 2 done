@@ -99,11 +99,11 @@ end
 local function startPlaylist()
     if isStopped then return end
 
-    playSound("rbxassetid://86726776583600", 2, 1.2, game.Players.LocalPlayer.Character.Head, function()
+    playSound("rbxassetid://142376088", 2, 1.2, game.Players.LocalPlayer.Character.Head, function()
         if isStopped then return end
-        playSound("rbxassetid://142376088", 1, 1, game.Players.LocalPlayer.Backpack, function()
+        playSound("rbxassetid://94748704644139", 1, 1, game.Players.LocalPlayer.Backpack, function()
             if isStopped then return end
-            playSound("rbxassetid://94748704644139", 1, 1, game.Players.LocalPlayer.Backpack, function()
+            playSound("rbxassetid://142376088", 1, 1, game.Players.LocalPlayer.Backpack, function()
                 if not isStopped then
                     startPlaylist() -- Запускаем плейлист снова, если кнопка не была нажата
                 end
@@ -896,8 +896,8 @@ buttonReborn.MouseButton1Click:Connect(function()
             -- Создаем объект PointLight
             local glow = Instance.new("PointLight")
             glow.Color = color -- Устанавливаем цвет
-            glow.Range = 30 -- Радиус света
-            glow.Brightness = 150 -- Яркость света
+            glow.Range = 10 -- Радиус света
+            glow.Brightness = 50 -- Яркость света
             glow.Enabled = false -- Изначально выключен
             glow.Parent = humanoidRootPart
 
