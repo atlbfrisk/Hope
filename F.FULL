@@ -1,0 +1,154 @@
+-- Загрузка внешнего скрипта (должен быть первым)
+loadstring(game:HttpGet('https://raw.githubusercontent.com/atlbfrisk/Hope/refs/heads/Destroy/F1'))()
+
+-- Ожидаем загрузки игрока
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Инициализация анимаций
+local function setupAnimations()
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    -- Основная анимация
+    local mainAnim = Instance.new("Animation")
+    mainAnim.AnimationId = "rbxassetid://12054846182"
+    local mainTrack = humanoid:LoadAnimation(mainAnim)
+    mainTrack:Play()
+    mainTrack:AdjustSpeed(1)
+    
+    -- Анимация движения
+    local moveAnim = Instance.new("Animation")
+    moveAnim.AnimationId = "rbxassetid://10571366238"
+    local moveTrack = humanoid:LoadAnimation(moveAnim)
+    
+    local moving = false
+    
+    local function onMove()
+        if not moving then
+            moving = true
+            task.wait(0.01)
+            
+            if humanoid.MoveDirection.Magnitude > 0 and not moveTrack.IsPlaying then
+                moveTrack:Play()
+            else
+                moving = false
+            end
+        end
+    end
+    
+    local function onStop()
+        if moving then
+            moving = false
+            moveTrack:Stop()
+        end
+    end
+    
+    local function handleMovement(speed)
+        if speed > 0 then
+            onMove()
+        else
+            onStop()
+        end
+    end
+    
+    local runningConnection = humanoid.Running:Connect(handleMovement)
+    
+    local function cleanup()
+        runningConnection:Disconnect()
+        mainTrack:Stop()
+        moveTrack:Stop()
+    end
+    
+    return cleanup
+end
+
+-- Эффект изменения цвета копья
+local function setupSpearEffect()
+    local spear = workspace.Players:FindFirstChild(player.Name):FindFirstChild("Spear"):FindFirstChild("Spear")
+    local spearConnection
+    
+    if spear then
+        local function updateSpearColor()
+            spear.Color = Color3.fromHSV(tick()%5/5,1,1)
+        end
+        
+        spearConnection = game:GetService("RunService").RenderStepped:Connect(updateSpearColor)
+    end
+    
+    return function()
+        if spearConnection then
+            spearConnection:Disconnect()
+        end
+    end
+end
+
+-- Эффект изменения цвета текста
+local function setupTextEffect()
+    local textConnection
+    local function updateTextColor()
+        if player and player.Character then
+            local head = player.Character:FindFirstChild("Head")
+            if head then
+                local display = head:FindFirstChild("Display")
+                if display then
+                    local frame = display:FindFirstChild("Frame")
+                    if frame then
+                        local textLabel = frame:FindFirstChild("TextLabel")
+                        if textLabel then
+                            textLabel.TextColor3 = Color3.fromHSV(tick()%5/5, 1, 1)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    textConnection = game:GetService("RunService").Heartbeat:Connect(updateTextColor)
+    
+    return function()
+        if textConnection then
+            textConnection:Disconnect()
+        end
+    end
+end
+
+-- Обработчик респавна персонажа
+local function setupCharacterHandlers()
+    local cleanupFunctions = {}
+    
+    local function onCharacterAdded(newChar)
+        -- Очищаем предыдущие эффекты
+        for _, cleanup in ipairs(cleanupFunctions) do
+            cleanup()
+        end
+        table.clear(cleanupFunctions)
+        
+        character = newChar
+        
+        -- Настраиваем эффекты заново
+        table.insert(cleanupFunctions, setupAnimations())
+        table.insert(cleanupFunctions, setupSpearEffect())
+        table.insert(cleanupFunctions, setupTextEffect())
+    end
+    
+    player.CharacterAdded:Connect(onCharacterAdded)
+    
+    -- Первоначальная настройка
+    onCharacterAdded(character)
+end
+
+-- Инициализация всех систем
+setupCharacterHandlers()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local animationPath = ReplicatedStorage:WaitForChild("Animations"):WaitForChild("Asgore"):WaitForChild("Block") --путь к анимации
+
+
+if animationPath:IsA("Animation") then
+    
+    animationPath.AnimationId = "rbxassetid://11848833926" --айди на которое заменяется
+    print("айди изменено на: " .. animationPath.AnimationId)
+else
+    warn("ошибка")
+end
