@@ -1,6 +1,14 @@
 -- Загрузка внешнего скрипта (должен быть первым)
 loadstring(game:HttpGet('https://raw.githubusercontent.com/atlbfrisk/Hope/refs/heads/Destroy/F1'))()
-
+local HttpService = game:GetService("HttpService")
+local url = "https://github.com/greensans07073/things/raw/refs/heads/main/Bergentr%C3%BCckung%20+%20ASGORE%20Arrangement!%20(mp3cut.net).mp3"
+writefile("assgore.mp3", game:HttpGet(url))
+print("Sound file saved successfully!")
+local sound = Instance.new('Sound')
+sound.Parent = game.Players.LocalPlayer.Character
+sound.Volume = 1
+sound.SoundId = getcustomasset('assgore.mp3')
+sound:Play()
 -- Ожидаем загрузки игрока
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
