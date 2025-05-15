@@ -27,7 +27,7 @@ local function loadMusicAsync()
             
             sound1 = Instance.new('Sound')
             sound1.Name = "Music1"
-            sound1.Volume = 1
+            sound1.Volume = 0.8
             sound1.SoundId = getcustomasset('unclear.mp3')
             sound1.Looped = false
             sound1.Parent = character
@@ -45,7 +45,7 @@ local function loadMusicAsync()
             
             sound2 = Instance.new('Sound')
             sound2.Name = "Music2"
-            sound2.Volume = 1
+            sound2.Volume = 0.8
             sound2.SoundId = getcustomasset('sobbing.mp3')
             sound2.Looped = false
             sound2.Parent = character
