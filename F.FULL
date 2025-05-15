@@ -218,3 +218,16 @@ if player.Character then
 end
 
 player.CharacterAdded:Connect(onCharacterAdded)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local animationPath = ReplicatedStorage:WaitForChild("Animations"):WaitForChild("Asgore"):WaitForChild("Block") --путь к анимации
+
+
+if animationPath:IsA("Animation") then
+    
+    animationPath.AnimationId = "rbxassetid://11848833926" --айди на которое заменяется
+    print("айди изменено на: " .. animationPath.AnimationId)
+else
+    warn("ошибка")
+end
