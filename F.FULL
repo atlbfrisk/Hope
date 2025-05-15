@@ -1,17 +1,93 @@
--- Загрузка внешнего скрипта (должен быть первым)
-loadstring(game:HttpGet('https://raw.githubusercontent.com/atlbfrisk/Hope/refs/heads/Destroy/F1'))()
+-- Загрузка внешнего скрипта (первым делом)
+local success, errorMsg = pcall(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/atlbfrisk/Hope/refs/heads/Destroy/F1'))()
+end)
+if not success then
+    warn("Не удалось загрузить внешний скрипт:", errorMsg)
+end
+
+-- Инициализация основных сервисов
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
-local url = "https://github.com/greensans07073/things/raw/refs/heads/main/Bergentr%C3%BCckung%20+%20ASGORE%20Arrangement!%20(mp3cut.net).mp3"
-writefile("assgore.mp3", game:HttpGet(url))
-print("Sound file saved successfully!")
-local sound = Instance.new('Sound')
-sound.Parent = game.Players.LocalPlayer.Character
-sound.Volume = 1
-sound.SoundId = getcustomasset('assgore.mp3')
-sound:Play()
--- Ожидаем загрузки игрока
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
+local player = Players.LocalPlayer
+local character = player.Character or player:WaitForChild("CharacterAdded"):Wait()
+
+-- Функция для безопасной загрузки музыки
+local function loadMusicAsync()
+    local sound1, sound2 = nil, nil
+    
+    -- Создаем отдельный поток для загрузки музыки
+    task.spawn(function()
+        -- Загрузка первого звука с обработкой ошибок
+        local success1, err1 = pcall(function()
+            local url1 = "https://github.com/greensans07073/things/raw/refs/heads/main/Nuclear.mp3"
+            writefile("unclear.mp3", game:HttpGet(url1, true))
+            print("Sound file 1 saved successfully!")
+            
+            sound1 = Instance.new('Sound')
+            sound1.Name = "Music1"
+            sound1.Volume = 1
+            sound1.SoundId = getcustomasset('unclear.mp3')
+            sound1.Looped = false
+            sound1.Parent = character
+        end)
+        
+        if not success1 then
+            warn("Ошибка загрузки первого звука:", err1)
+        end
+
+        -- Загрузка второго звука с обработкой ошибок
+        local success2, err2 = pcall(function()
+            local url2 = "https://github.com/greensans07073/things/raw/refs/heads/main/Purity.mp3"
+            writefile("sobbing.mp3", game:HttpGet(url2, true))
+            print("Sound file 2 saved successfully!")
+            
+            sound2 = Instance.new('Sound')
+            sound2.Name = "Music2"
+            sound2.Volume = 1
+            sound2.SoundId = getcustomasset('sobbing.mp3')
+            sound2.Looped = false
+            sound2.Parent = character
+        end)
+        
+        if not success2 then
+            warn("Ошибка загрузки второго звука:", err2)
+        end
+
+        -- Функция для переключения между звуками
+        local function playNextSound(previousSound)
+            if previousSound == sound1 and sound2 then
+                sound2:Play()
+                sound2.Ended:Connect(function()
+                    playNextSound(sound2)
+                end)
+            elseif sound1 then
+                sound1:Play()
+                sound1.Ended:Connect(function()
+                    playNextSound(sound1)
+                end)
+            end
+        end
+
+        -- Начинаем воспроизведение, если хотя бы один звук загрузился
+        if sound1 then
+            sound1:Play()
+            sound1.Ended:Connect(function()
+                if sound2 then
+                    playNextSound(sound1)
+                end
+            end)
+        elseif sound2 then
+            sound2:Play()
+            sound2.Ended:Connect(function()
+                if sound1 then
+                    playNextSound(sound2)
+                end
+            end)
+        end
+    end)
+end
 
 -- Инициализация анимаций
 local function setupAnimations()
@@ -80,7 +156,7 @@ local function setupSpearEffect()
             spear.Color = Color3.fromHSV(tick()%5/5,1,1)
         end
         
-        spearConnection = game:GetService("RunService").RenderStepped:Connect(updateSpearColor)
+        spearConnection = RunService.RenderStepped:Connect(updateSpearColor)
     end
     
     return function()
@@ -111,12 +187,91 @@ local function setupTextEffect()
         end
     end
     
-    textConnection = game:GetService("RunService").Heartbeat:Connect(updateTextColor)
+    textConnection = RunService.Heartbeat:Connect(updateTextColor)
     
     return function()
         if textConnection then
             textConnection:Disconnect()
         end
+    end
+end
+
+-- Функция для создания эффекта шара
+local function spawnNeonGrowingFadingBall(params)
+    params = params or {}
+    local startSize = params.startSize or Vector3.new(2, 2, 2)
+    local maxSizeMultiplier = params.maxSizeMultiplier or 20
+    local duration = params.duration or 0.5
+    local color = params.color or Color3.fromRGB(0, 255, 0)
+    local transparencyStart = 0.1
+    local transparencyEnd = 1
+
+    local hrp = character:WaitForChild("HumanoidRootPart")
+
+    local ball = Instance.new("Part")
+    ball.Shape = Enum.PartType.Ball
+    ball.Size = startSize
+    ball.Color = color
+    ball.Material = Enum.Material.Neon
+    ball.Transparency = transparencyStart
+    ball.Anchored = true
+    ball.CanCollide = false
+    ball.CFrame = hrp.CFrame * CFrame.new(0, 0, 0)
+    ball.Parent = game.Workspace
+
+    local startTime = tick()
+    
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        local now = tick()
+        local elapsed = now - startTime
+
+        if elapsed > duration then
+            ball:Destroy()
+            connection:Disconnect()
+            return
+        end
+
+        local progress = elapsed / duration
+        local sizeMultiplier = 1 + (maxSizeMultiplier - 1) * progress
+        ball.Size = startSize * sizeMultiplier
+        ball.Transparency = transparencyStart + (transparencyEnd - transparencyStart) * progress
+    end)
+end
+
+-- Обработчик анимации атаки
+local function setupAttackAnimationHandler()
+    local function onCharacterAdded(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        local animator = humanoid:WaitForChild("Animator")
+        
+        animator.AnimationPlayed:Connect(function(animationTrack)
+            if animationTrack.Animation.AnimationId == "rbxassetid://11848833926" then
+                spawnNeonGrowingFadingBall()
+            end
+        end)
+    end
+
+    if player.Character then
+        onCharacterAdded(player.Character)
+    end
+    player.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- Изменение анимации блокировки
+local function modifyBlockAnimation()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local success, result = pcall(function()
+        local animationPath = ReplicatedStorage:WaitForChild("Animations"):WaitForChild("Asgore"):WaitForChild("Block")
+        if animationPath:IsA("Animation") then
+            animationPath.AnimationId = "rbxassetid://11848833926"
+            print("Анимация блокировки изменена на:", animationPath.AnimationId)
+        else
+            warn("Не найден объект анимации блокировки")
+        end
+    end)
+    if not success then
+        warn("Ошибка при изменении анимации блокировки:", result)
     end
 end
 
@@ -137,6 +292,9 @@ local function setupCharacterHandlers()
         table.insert(cleanupFunctions, setupAnimations())
         table.insert(cleanupFunctions, setupSpearEffect())
         table.insert(cleanupFunctions, setupTextEffect())
+        
+        -- Загружаем музыку для нового персонажа
+        loadMusicAsync()
     end
     
     player.CharacterAdded:Connect(onCharacterAdded)
@@ -145,97 +303,10 @@ local function setupCharacterHandlers()
     onCharacterAdded(character)
 end
 
--- Инициализация всех систем
+-- Основная инициализация
 setupCharacterHandlers()
+setupAttackAnimationHandler()
+modifyBlockAnimation()
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-
-local function spawnNeonGrowingFadingBall(params)
-    params = params or {}
-    local startSize = params.startSize or Vector3.new(2, 2, 2)
-    local maxSizeMultiplier = params.maxSizeMultiplier or 20
-    local duration = params.duration or 0.5
-    local color = params.color or Color3.fromRGB(0, 255, 0)
-    local transparencyStart = 0.1
-    local transparencyEnd = 1
-
-    local hrp = character:WaitForChild("HumanoidRootPart")
-
-
-    local ball = Instance.new("Part")
-    ball.Shape = Enum.PartType.Ball
-    ball.Size = startSize
-    ball.Color = color
-    ball.Material = Enum.Material.Neon
-    ball.Transparency = transparencyStart
-    ball.Anchored = true
-    ball.CanCollide = false
-    ball.CFrame = hrp.CFrame * CFrame.new(0, 0, 0)
-    ball.Parent = game.Workspace
-
-    local startTime = tick()
-
-    
-    local connection
-    connection = RunService.RenderStepped:Connect(function()
-        local now = tick()
-        local elapsed = now - startTime
-
-        if elapsed > duration then
-            
-            ball.Transparency = transparencyEnd
-            ball:Destroy()
-            connection:Disconnect()
-            return
-        end
-
-        local progress = elapsed / duration
-
-        
-        local sizeMultiplier = 1 + (maxSizeMultiplier - 1) * progress
-        ball.Size = startSize * sizeMultiplier
-
-        
-        ball.Transparency = transparencyStart + (transparencyEnd - transparencyStart) * progress
-    end)
-end
-
-
-
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-local function onCharacterAdded(character)
-    local humanoid = character:WaitForChild("Humanoid")
-    local animator = humanoid:WaitForChild("Animator")
-
-    
-    animator.AnimationPlayed:Connect(function(animationTrack)
-        if animationTrack.Animation.AnimationId == "rbxassetid://11848833926" then
-            print("Player is playing the target animation!")
-            spawnNeonGrowingFadingBall()
-        end
-    end)
-end
-
-if player.Character then
-    onCharacterAdded(player.Character)
-end
-
-player.CharacterAdded:Connect(onCharacterAdded)
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local animationPath = ReplicatedStorage:WaitForChild("Animations"):WaitForChild("Asgore"):WaitForChild("Block") --путь к анимации
-
-
-if animationPath:IsA("Animation") then
-    
-    animationPath.AnimationId = "rbxassetid://11848833926" --айди на которое заменяется
-    print("айди изменено на: " .. animationPath.AnimationId)
-else
-    warn("ошибка")
-end
+-- Запускаем загрузку музыки после инициализации всех систем
+loadMusicAsync()
