@@ -140,15 +140,81 @@ end
 -- Инициализация всех систем
 setupCharacterHandlers()
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
 
-local animationPath = ReplicatedStorage:WaitForChild("Animations"):WaitForChild("Asgore"):WaitForChild("Block") --путь к анимации
+local function spawnNeonGrowingFadingBall(params)
+    params = params or {}
+    local startSize = params.startSize or Vector3.new(2, 2, 2)
+    local maxSizeMultiplier = params.maxSizeMultiplier or 20
+    local duration = params.duration or 0.5
+    local color = params.color or Color3.fromRGB(0, 255, 0)
+    local transparencyStart = 0.1
+    local transparencyEnd = 1
+
+    local hrp = character:WaitForChild("HumanoidRootPart")
 
 
-if animationPath:IsA("Animation") then
+    local ball = Instance.new("Part")
+    ball.Shape = Enum.PartType.Ball
+    ball.Size = startSize
+    ball.Color = color
+    ball.Material = Enum.Material.Neon
+    ball.Transparency = transparencyStart
+    ball.Anchored = true
+    ball.CanCollide = false
+    ball.CFrame = hrp.CFrame * CFrame.new(0, 0, 0)
+    ball.Parent = game.Workspace
+
+    local startTime = tick()
+
     
-    animationPath.AnimationId = "rbxassetid://11848833926" --айди на которое заменяется
-    print("айди изменено на: " .. animationPath.AnimationId)
-else
-    warn("ошибка")
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        local now = tick()
+        local elapsed = now - startTime
+
+        if elapsed > duration then
+            
+            ball.Transparency = transparencyEnd
+            ball:Destroy()
+            connection:Disconnect()
+            return
+        end
+
+        local progress = elapsed / duration
+
+        
+        local sizeMultiplier = 1 + (maxSizeMultiplier - 1) * progress
+        ball.Size = startSize * sizeMultiplier
+
+        
+        ball.Transparency = transparencyStart + (transparencyEnd - transparencyStart) * progress
+    end)
 end
+
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function onCharacterAdded(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local animator = humanoid:WaitForChild("Animator")
+
+    
+    animator.AnimationPlayed:Connect(function(animationTrack)
+        if animationTrack.Animation.AnimationId == "rbxassetid://11848833926" then
+            print("Player is playing the target animation!")
+            spawnNeonGrowingFadingBall()
+        end
+    end)
+end
+
+if player.Character then
+    onCharacterAdded(player.Character)
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
