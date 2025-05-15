@@ -1,0 +1,146 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Создаем GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+
+-- Главный контейнер
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0.35, 0, 0.7, 0)
+mainFrame.Position = UDim2.new(0.65, 0, 0.15, 0)
+mainFrame.BackgroundTransparency = 0.7
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = screenGui
+
+-- Внутренний фрейм с прокруткой
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -10, 1, -50)
+scrollFrame.Position = UDim2.new(0, 5, 0, 40)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollFrame.Parent = mainFrame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Padding = UDim.new(0, 5)
+uiListLayout.Parent = scrollFrame
+
+-- Заголовок
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Text = "Объекты в радиусе 10м:"
+titleLabel.Size = UDim2.new(1, -80, 0, 30)
+titleLabel.Position = UDim2.new(0, 5, 0, 5)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = mainFrame
+
+-- Кнопка очистки
+local clearButton = Instance.new("TextButton")
+clearButton.Text = "Очистить всё"
+clearButton.Size = UDim2.new(0.35, 0, 0, 30)
+clearButton.Position = UDim2.new(0.65, 0, 0, 5)
+clearButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+clearButton.TextColor3 = Color3.new(1, 1, 1)
+clearButton.Font = Enum.Font.SourceSansBold
+clearButton.Parent = mainFrame
+
+-- Таблица для хранения объектов
+local trackedObjects = {}
+local cleanupMode = false
+
+-- Получение полного пути объекта
+local function getFullPath(obj)
+    local path = obj.Name
+    local parent = obj.Parent
+    while parent and parent ~= game do
+        path = parent.Name .. "." .. path
+        parent = parent.Parent
+    end
+    return path
+end
+
+-- Создание элемента в списке
+local function createObjectEntry(obj)
+    local entryFrame = Instance.new("Frame")
+    entryFrame.Size = UDim2.new(1, -10, 0, 25)
+    entryFrame.BackgroundTransparency = 1
+    entryFrame.Parent = scrollFrame
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Text = obj.Name
+    nameLabel.Size = UDim2.new(0.4, 0, 1, 0)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.TextColor3 = Color3.new(1, 1, 1)
+    nameLabel.Font = Enum.Font.SourceSans
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = entryFrame
+
+    local pathLabel = Instance.new("TextLabel")
+    pathLabel.Text = getFullPath(obj)
+    pathLabel.Size = UDim2.new(0.6, 0, 1, 0)
+    pathLabel.Position = UDim2.new(0.4, 0, 0, 0)
+    pathLabel.BackgroundTransparency = 1
+    pathLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    pathLabel.Font = Enum.Font.SourceSans
+    pathLabel.TextXAlignment = Enum.TextXAlignment.Left
+    pathLabel.Parent = entryFrame
+
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Text = obj.Parent and "[АКТИВЕН]" or "[УДАЛЕН]"
+    statusLabel.TextColor3 = obj.Parent and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+    statusLabel.Size = UDim2.new(0.2, 0, 1, 0)
+    statusLabel.Position = UDim2.new(0.8, 0, 0, 0)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Font = Enum.Font.SourceSansBold
+    statusLabel.Parent = entryFrame
+
+    -- Обновление статуса при изменении
+    obj.AncestryChanged:Connect(function()
+        statusLabel.Text = obj.Parent and "[АКТИВЕН]" or "[УДАЛЕН]"
+        statusLabel.TextColor3 = obj.Parent and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+    end)
+
+    return entryFrame
+end
+
+-- Очистка всех объектов
+clearButton.MouseButton1Click:Connect(function()
+    cleanupMode = true
+    for _, entry in pairs(trackedObjects) do
+        entry:Destroy()
+    end
+    trackedObjects = {}
+    cleanupMode = false
+end)
+
+-- Проверка объектов в радиусе
+local function checkObjects()
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj ~= humanoidRootPart then
+            local distance = (humanoidRootPart.Position - obj.Position).Magnitude
+            if distance <= 10 and not trackedObjects[obj] then
+                trackedObjects[obj] = createObjectEntry(obj)
+            end
+        end
+    end
+end
+
+-- Автоматическое добавление новых объектов
+workspace.DescendantAdded:Connect(function(obj)
+    if cleanupMode then return end
+    if obj:IsA("BasePart") and obj ~= humanoidRootPart then
+        local distance = (humanoidRootPart.Position - obj.Position).Magnitude
+        if distance <= 20 and not trackedObjects[obj] then
+            trackedObjects[obj] = createObjectEntry(obj)
+        end
+    end
+end)
+
+-- Первоначальная проверка
+checkObjects()
