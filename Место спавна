@@ -1,0 +1,176 @@
+
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+local Debris = game:GetService("Debris")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+local workspace = game:GetService("Workspace")
+local Random = Random.new()
+
+local center = Vector3.new(0, 100, 0)
+local baseSize = 100
+local layersCount = 8
+local lightBlockSize = 2
+local minBrightness = 0.2
+local maxBrightness = 3
+
+-- Блокировка ввода
+StarterGui:SetCore("TopbarEnabled", false)
+UserInputService.ModalEnabled = true
+
+-- Подавление глобального освещения
+Lighting.Brightness = 0.01
+Lighting.GlobalShadows = true
+Lighting.EnvironmentDiffuseScale = 0
+Lighting.EnvironmentSpecularScale = 0
+Lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+Lighting.ClockTime = 0
+Lighting.FogEnd = 100
+
+local function createFace(name, sizeX, sizeY, sizeZ, offset, color, transparency, canCollide, parent)
+    local part = Instance.new("Part")
+    part.Name = name
+    part.Size = Vector3.new(sizeX, sizeY, sizeZ)
+    part.Anchored = true
+    part.CanCollide = canCollide
+    part.Transparency = transparency
+    part.Color = color
+    part.Material = Enum.Material.SmoothPlastic
+    part.CFrame = CFrame.new(center + offset)
+    part.Parent = parent
+    return part
+end
+
+local function createCube(size, transparency, canCollide, color, liftBottom, parent)
+    local half = size / 2
+    local model = Instance.new("Model")
+    model.Name = "CubeLayer_"..tostring(size)
+    model.Parent = parent
+
+    createFace("Front", size, size, 1, Vector3.new(0, 0, half), color, transparency, canCollide, model)
+    createFace("Back", size, size, 1, Vector3.new(0, 0, -half), color, transparency, canCollide, model)
+    createFace("Left", 1, size, size, Vector3.new(-half, 0, 0), color, transparency, canCollide, model)
+    createFace("Right", 1, size, size, Vector3.new(half, 0, 0), color, transparency, canCollide, model)
+    createFace("Top", size, 1, size, Vector3.new(0, half, 0), color, transparency, canCollide, model)
+
+    local bottomY = liftBottom and (size / 2 - size * 0.5) or -half
+    createFace("Bottom", size, 1, size, Vector3.new(0, bottomY, 0), color, transparency, canCollide, model)
+
+    return model
+end
+
+local function createStar(position, color, size, parent)
+    local star = Instance.new("Part")
+    star.Size = Vector3.new(size, size, size)
+    star.Anchored = true
+    star.CanCollide = false
+    star.Color = color
+    star.Material = Enum.Material.Neon
+    star.Position = position
+    star.Transparency = 0
+    star.Parent = parent
+end
+
+local function createFallingStar(origin, color, parent)
+    local star = Instance.new("Part")
+    star.Size = Vector3.new(0.3, 0.3, 0.3)
+    star.Anchored = false
+    star.CanCollide = false
+    star.Color = color
+    star.Material = Enum.Material.Neon
+    star.Position = origin
+    star.Velocity = Vector3.new(0, -50, 0)
+    star.Parent = parent
+
+    local tail = Instance.new("Trail")
+    tail.Color = ColorSequence.new(color)
+    tail.Lifetime = 0.4
+    tail.Attachment0 = Instance.new("Attachment", star)
+    tail.Attachment1 = Instance.new("Attachment", star)
+    tail.Parent = star
+
+    Debris:AddItem(star, 5)
+end
+
+local function createMilkyWay(centerPos, radius, parent)
+    for i = 1, 300 do
+        local offset = Vector3.new(
+            Random:NextNumber(-radius, radius),
+            Random:NextNumber(-radius / 5, radius / 5),
+            Random:NextNumber(-radius, radius)
+        )
+        local pos = centerPos + offset
+        createStar(pos, Color3.fromHSV(Random:NextNumber(), 0.4, 1), 0.4, parent)
+    end
+end
+
+local facesNormals = {
+    Vector3.new(0, 0, 1), Vector3.new(0, 0, -1), Vector3.new(-1, 0, 0),
+    Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), Vector3.new(0, -1, 0)
+}
+
+local function getPositionOnFace(size, faceNormal)
+    local x = (Random:NextNumber() - 0.5) * size
+    local y = (Random:NextNumber() - 0.5) * size
+    local half = size / 2 + 2
+    if faceNormal.X ~= 0 then return center + Vector3.new(faceNormal.X * half, y, x) end
+    if faceNormal.Y ~= 0 then return center + Vector3.new(x, faceNormal.Y * half, y) end
+    return center + Vector3.new(x, y, faceNormal.Z * half)
+end
+
+local container = Instance.new("Model", workspace)
+container.Name = "LayeredCube"
+
+local currentSize = baseSize
+for i = 1, layersCount do
+    local size = currentSize
+    local transparency = i == 1 and 1 or 0.1 + (i / layersCount) * 0.8
+    local canCollide = (i == 1)
+    local color = Color3.new(0, 0, 0)
+    local liftBottom = (i == 1)
+
+    local model = createCube(size, transparency, canCollide, color, liftBottom, container)
+
+    if i > 1 then
+        local brightness = minBrightness + (i / layersCount) * (maxBrightness - minBrightness)
+        for j = 1, 5 do
+            local normal = facesNormals[Random:NextInteger(1, #facesNormals)]
+            local pos = getPositionOnFace(size, normal)
+            createStar(pos, Color3.fromHSV(Random:NextNumber(), 0.4, 1), 0.4, container)
+        end
+    end
+
+    for s = 1, 30 * i do
+        local normal = facesNormals[Random:NextInteger(1, #facesNormals)]
+        local pos = getPositionOnFace(size + 20, normal)
+        createStar(pos, Color3.fromHSV(Random:NextNumber(), 0.4, 1), 0.3 + Random:NextNumber() * 0.4, container)
+    end
+
+    if i == math.floor(layersCount / 2) then
+        createMilkyWay(center + Vector3.new(0, 20, 0), size * 1.5, container)
+    end
+
+    currentSize = currentSize + (20 + i * 5)
+end
+
+-- Спавн звёзд в процессе (динамика)
+RunService.Heartbeat:Connect(function()
+    for _ = 1, 4 do
+        local origin = center + Vector3.new(Random:NextNumber(-150, 150), 150, Random:NextNumber(-150, 150))
+        createFallingStar(origin, Color3.fromHSV(Random:NextNumber(), 0.7, 1), container)
+    end
+end)
+
+-- Телепорт + разблокировка управления
+wait(1)
+hrp.CFrame = CFrame.new(center + Vector3.new(0, baseSize * 0.25, 0))
+StarterGui:SetCore("TopbarEnabled", true)
+UserInputService.ModalEnabled = false
+
+print("Сцена создана: игрок телепортирован, падающие звезды запущены, интерфейс разблокирован.")
