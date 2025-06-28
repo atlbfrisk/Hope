@@ -1,0 +1,145 @@
+local Players    = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+-- Ждём LocalPlayer и PlayerGui
+local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+repeat task.wait() until LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Создаём GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name         = "AnimLogger"
+screenGui.ResetOnSpawn = false
+screenGui.Parent       = PlayerGui
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size             = UDim2.new(0.36, 0, 0.5, 0)
+frame.Position         = UDim2.new(0.32, 0, 0.25, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel  = 0
+frame.Active           = true
+frame.Draggable        = true
+
+-- Верхняя панель
+local top = Instance.new("Frame", frame)
+top.Size             = UDim2.new(1, 0, 0, 28)
+top.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+local title = Instance.new("TextLabel", top)
+title.Size               = UDim2.new(1, -60, 1, 0)
+title.Position           = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text               = "🎬 Логгер Анимаций"
+title.TextColor3         = Color3.new(1, 1, 1)
+title.Font               = Enum.Font.GothamBold
+title.TextSize           = 15
+title.TextXAlignment     = Enum.TextXAlignment.Left
+
+-- Кнопка скрыть/показать
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Position           = UDim2.new(0, 0, 0, 28)
+scroll.Size               = UDim2.new(1, 0, 1, -28)
+scroll.CanvasSize         = UDim2.new(0, 0, 0, 0)
+scroll.BackgroundColor3   = Color3.fromRGB(18, 18, 18)
+scroll.ScrollBarThickness = 6
+
+local layout = Instance.new("UIListLayout", scroll)
+layout.Padding   = UDim.new(0, 6)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 6)
+end)
+
+local toggleBtn = Instance.new("TextButton", top)
+toggleBtn.Size             = UDim2.new(0, 28, 0, 28)
+toggleBtn.Position         = UDim2.new(1, -28, 0, 0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+toggleBtn.TextColor3       = Color3.new(1, 1, 1)
+toggleBtn.Font             = Enum.Font.GothamBold
+toggleBtn.TextSize         = 20
+toggleBtn.Text             = "–"
+toggleBtn.BorderSizePixel  = 0
+
+local visible = true
+toggleBtn.MouseButton1Click:Connect(function()
+    visible = not visible
+    scroll.Visible = visible
+    toggleBtn.Text = visible and "–" or "+"
+    frame.Size = visible and UDim2.new(0.36,0,0.5,0) or UDim2.new(0.36,0,0,28)
+end)
+
+local logged = {}
+
+-- Утилита: копирует + уведомляет
+local function copyToClipboard(text)
+    setclipboard(text)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = "Скопировано",
+            Text = text,
+            Duration = 2
+        })
+    end)
+end
+
+-- Генерация кнопки
+local function createButton(parent, text, position, onClick)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size             = UDim2.new(0, 80, 0, 20)
+    btn.Position         = position
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3       = Color3.new(1, 1, 1)
+    btn.Font             = Enum.Font.Gotham
+    btn.TextSize         = 13
+    btn.Text             = text
+    btn.BorderSizePixel  = 0
+    btn.AutoButtonColor  = true
+    btn.MouseButton1Click:Connect(onClick)
+    return btn
+end
+
+-- Основная функция логирования
+local function log(track)
+    local anim = track.Animation
+    if not anim or not anim.AnimationId then return end
+    if logged[anim.AnimationId] then return end
+    logged[anim.AnimationId] = true
+
+    local id     = anim.AnimationId:match("%d+") or "?"
+    local name   = anim.Name or "Без названия"
+    local length = string.format("%.2fs", track.Length or 0)
+    local looped = track.Looped and "Повтор" or "Одиночная"
+    local path   = anim:GetFullName()
+
+    -- Контейнер элемента
+    local itemFrame = Instance.new("Frame", scroll)
+    itemFrame.Size             = UDim2.new(1, -12, 0, 90)
+    itemFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
+    itemFrame.BorderSizePixel  = 0
+    -- Текст
+    local label = Instance.new("TextLabel", itemFrame)
+    label.Size               = UDim2.new(1, -10, 0, 60)
+    label.Position           = UDim2.new(0, 5, 0, 5)
+    label.BackgroundTransparency = 1
+    label.TextColor3         = Color3.new(1, 1, 1)
+    label.Font               = Enum.Font.Gotham
+    label.TextSize           = 13
+    label.TextWrapped        = true
+    label.TextXAlignment     = Enum.TextXAlignment.Left
+    label.TextYAlignment     = Enum.TextYAlignment.Top
+    label.Text               = string.format(
+        "🎞 %s\n🆔 %s\n⌚ %s   |   %s\n📂 %s",
+        name, id, length, looped, path
+    )
+    -- Кнопки копирования
+    createButton(itemFrame, "Копировать ID",   UDim2.new(1, -85, 0, 65), function() copyToClipboard(id)   end)
+    createButton(itemFrame, "Копировать путь", UDim2.new(1, -85, 0, 40), function() copyToClipboard(path) end)
+end
+-- Подключаемся к humanoid.AnimationPlayed
+local function connect()
+    local char     = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.AnimationPlayed:Connect(log)
+end
+connect()
+LocalPlayer.CharacterAdded:Connect(connect)
