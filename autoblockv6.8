@@ -1,0 +1,263 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+if CoreGui:FindFirstChild("AutoBlockGUI") then CoreGui.AutoBlockGUI:Destroy() end
+
+local PLAYER = Players.LocalPlayer
+local BLOCK_KEY = Enum.KeyCode.F
+local BLOCK_DURATION = 0.19
+local MOVE_DIST = 5
+local HIT_RANGE = 7
+local ACTIVATION_DIST = 10.9
+local MAX_BLOCKS = 3
+local currentBlocks = MAX_BLOCKS
+local firstBlockEndTime = 0
+
+local ATTACK_ANIMATIONS = {
+    [11207662874]=true,[11207670721]=true,[11207672156]=true,[11207673867]=true,[11207679458]=true,
+    [15629497459]=true,[15629499910]=true,[15629500733]=true,[15629502112]=true,[15629503244]=true,
+    [15629511042]=true,[15629513491]=true,[15629517083]=true,[15629519342]=true,
+    [11231243775]=true,[11231244846]=true,[11231246872]=true,[11231248372]=true,
+    [10588237861]=true,[10588239400]=true,[10588398287]=true,[10588553657]=true,
+    [11893647921]=true,[11893651874]=true,[11893655479]=true,[11893656895]=true,
+    [9148048853]=true,[9148253448]=true,[9148459574]=true,[9148495241]=true,
+    [15845806481]=true,[15845811578]=true,[15845814314]=true,[15845816783]=true,[15845819447]=true,
+    [9735418770]=true,[9735419615]=true,[9735638973]=true,[9735640641]=true,
+    [9887104861]=true,[9887165948]=true,[9895255580]=true,[9895303154]=true,
+    [16133036251]=true,[16133040523]=true,[16133043629]=true,[16133051861]=true,
+    [12347995711]=true,[12347998046]=true,[12347992785]=true,[12347961932]=true,
+    [11548864019]=true,[11548867055]=true,[11548832844]=true,[11548831192]=true,
+    [14981492940]=true,[14981131691]=true,[14981465350]=true,[14981126271]=true,
+    [12055598371]=true,[12055577680]=true,[12055529887]=true,[12055469362]=true,
+    [11413969983]=true,[11413967750]=true,[11413965346]=true,[11413962980]=true,
+    [12279330537]=true,[12279328885]=true,[12279326068]=true,[12279324422]=true,
+    [12815491799]=true,[12815493047]=true,[12815494300]=true,[12815495416]=true,
+    [12815496330]=true,[13038347593]=true,[13038344485]=true,[13038341252]=true,
+    [13038338767]=true,[13120387401]=true,[13083941028]=true,[13083936899]=true,
+    [13083908756]=true,[14741023844]=true,[14741021297]=true,[14741019042]=true,
+    [14741016381]=true,[13758263720]=true,[13758267318]=true,[13758270367]=true,
+    [13758271843]=true,[13758275022]=true,[15159687093]=true,[15159689615]=true,
+    [15159692639]=true,[15159694704]=true,[13401966780]=true,[13401968630]=true,
+    [13401970501]=true,[13401972249]=true,[13401973971]=true,[15230194061]=true,
+    [15230200945]=true,[15230208172]=true,[15230205193]=true,[18855893233]=true,
+    [18855896006]=true,[18855899818]=true,[18855902853]=true,[18266291487]=true,
+    [18266324338]=true,[18266375633]=true,[18266380259]=true,[13272033958]=true,
+    [13272036611]=true,[13272038646]=true,[13272039553]=true
+}
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AutoBlockGUI"
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 100)
+MainFrame.Position = UDim2.new(0.8, -100, 0.2, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 180, 0, 30)
+ToggleButton.Position = UDim2.new(0.5, -90, 0.2, -15)
+ToggleButton.Text = "Автоблок: OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 14
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+ToggleButton.Parent = MainFrame
+
+local SelectPlayerButton = Instance.new("TextButton")
+SelectPlayerButton.Size = UDim2.new(0, 180, 0, 30)
+SelectPlayerButton.Position = UDim2.new(0.5, -90, 0.5, -15)
+SelectPlayerButton.Text = "Выбрать игрока"
+SelectPlayerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SelectPlayerButton.TextSize = 14
+SelectPlayerButton.Font = Enum.Font.GothamBold
+SelectPlayerButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+SelectPlayerButton.Parent = MainFrame
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(0, 180, 0, 20)
+StatusLabel.Position = UDim2.new(0.5, -90, 0.8, -10)
+StatusLabel.Text = "Цель: Все игроки"
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.TextSize = 12
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Parent = MainFrame
+
+local autoBlockEnabled = false
+local selectedPlayer = nil
+local playerListFrame = nil
+
+local function executeBlock()
+    if currentBlocks <= 0 then return end
+    
+    local wasMouseVisible = UserInputService.MouseIconEnabled
+    if wasMouseVisible then
+        UserInputService.MouseIconEnabled = false
+    end
+    
+    if currentBlocks == MAX_BLOCKS then
+        firstBlockEndTime = os.clock() + BLOCK_DURATION
+    end
+    
+    currentBlocks = currentBlocks - 1
+    
+    VirtualInputManager:SendKeyEvent(true, BLOCK_KEY, false, nil)
+    task.delay(BLOCK_DURATION, function()
+        VirtualInputManager:SendKeyEvent(false, BLOCK_KEY, false, nil)
+        if wasMouseVisible then
+            UserInputService.MouseIconEnabled = true
+        end
+        
+        if os.clock() >= firstBlockEndTime then
+            currentBlocks = MAX_BLOCKS
+        end
+    end)
+end
+
+local function shouldBlock(enemyRoot, root)
+    local dist = (root.Position - enemyRoot.Position).Magnitude
+    if dist > ACTIVATION_DIST then return false end
+    
+    local enemyDirection = enemyRoot.CFrame.LookVector
+    local predictedPos = enemyRoot.Position + (enemyDirection * MOVE_DIST)
+    return (root.Position - predictedPos).Magnitude <= HIT_RANGE
+end
+
+local function checkAttacks()
+    if not autoBlockEnabled or not PLAYER.Character then return end
+    
+    local root = PLAYER.Character:FindFirstChild("HumanoidRootPart")
+    local humanoid = PLAYER.Character:FindFirstChildOfClass("Humanoid")
+    if not root or not humanoid or humanoid.Health <= 0 then return end
+
+    local enemies = {}
+    
+    if selectedPlayer then
+        if selectedPlayer ~= PLAYER and selectedPlayer.Character then
+            table.insert(enemies, selectedPlayer)
+        end
+    else
+        for _, enemy in ipairs(Players:GetPlayers()) do
+            if enemy ~= PLAYER then
+                table.insert(enemies, enemy)
+            end
+        end
+    end
+
+    for _, enemy in ipairs(enemies) do
+        local enemyChar = enemy.Character
+        if not enemyChar then continue end
+        
+        local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
+        local enemyHumanoid = enemyChar:FindFirstChildOfClass("Humanoid")
+        if not enemyRoot or not enemyHumanoid or enemyHumanoid.Health <= 0 then continue end
+
+        if shouldBlock(enemyRoot, root) then
+            for _, track in ipairs(enemyHumanoid:GetPlayingAnimationTracks()) do
+                if track.Animation then
+                    local animId = tonumber(track.Animation.AnimationId:match("%d+$"))
+                    if animId and ATTACK_ANIMATIONS[animId] then
+                        if track.TimePosition <= 0.1 then
+                            executeBlock()
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function toggleAutoBlock()
+    autoBlockEnabled = not autoBlockEnabled
+    ToggleButton.Text = autoBlockEnabled and "Автоблок: ON" or "Автоблок: OFF"
+    ToggleButton.BackgroundColor3 = autoBlockEnabled and Color3.fromRGB(80, 180, 80) or Color3.fromRGB(60, 60, 80)
+end
+
+local function createPlayerList()
+    if playerListFrame then playerListFrame:Destroy() end
+    
+    playerListFrame = Instance.new("Frame")
+    playerListFrame.Size = UDim2.new(0, 180, 0, 200)
+    playerListFrame.Position = UDim2.new(0.5, -90, 1, 10)
+    playerListFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    playerListFrame.Parent = MainFrame
+    
+    local scrollFrame = Instance.new("ScrollingFrame")
+    scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollFrame.ScrollBarThickness = 5
+    scrollFrame.BackgroundTransparency = 1
+    scrollFrame.Parent = playerListFrame
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = scrollFrame
+    
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
+    end)
+    
+    local allPlayersButton = Instance.new("TextButton")
+    allPlayersButton.Size = UDim2.new(1, -10, 0, 30)
+    allPlayersButton.Position = UDim2.new(0, 5, 0, 5)
+    allPlayersButton.Text = "Все игроки"
+    allPlayersButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    allPlayersButton.TextSize = 14
+    allPlayersButton.Font = Enum.Font.Gotham
+    allPlayersButton.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+    allPlayersButton.Parent = scrollFrame
+    
+    allPlayersButton.MouseButton1Click:Connect(function()
+        selectedPlayer = nil
+        StatusLabel.Text = "Цель: Все игроки"
+        playerListFrame:Destroy()
+        playerListFrame = nil
+    end)
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= PLAYER then
+            local playerButton = Instance.new("TextButton")
+            playerButton.Size = UDim2.new(1, -10, 0, 30)
+            playerButton.Text = player.Name
+            playerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            playerButton.TextSize = 14
+            playerButton.Font = Enum.Font.Gotham
+            playerButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            playerButton.Parent = scrollFrame
+            
+            playerButton.MouseButton1Click:Connect(function()
+                selectedPlayer = player
+                StatusLabel.Text = "Цель: " .. player.Name
+                playerListFrame:Destroy()
+                playerListFrame = nil
+            end)
+        end
+    end
+end
+
+local function togglePlayerList()
+    if playerListFrame then
+        playerListFrame:Destroy()
+        playerListFrame = nil
+    else
+        createPlayerList()
+    end
+end
+
+ToggleButton.MouseButton1Click:Connect(toggleAutoBlock)
+SelectPlayerButton.MouseButton1Click:Connect(togglePlayerList)
+
+RunService.Heartbeat:Connect(function()
+    checkAttacks()
+    if currentBlocks < MAX_BLOCKS and os.clock() >= firstBlockEndTime then
+        currentBlocks = MAX_BLOCKS
+    end
+end)
