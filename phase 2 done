@@ -896,14 +896,14 @@ buttonReborn.MouseButton1Click:Connect(function()
             -- Создаем объект PointLight
             local glow = Instance.new("PointLight")
             glow.Color = color -- Устанавливаем цвет
-            glow.Range = 10 -- Радиус света
-            glow.Brightness = 50 -- Яркость света
+            glow.Range = 8 -- Радиус света
+            glow.Brightness = 20 -- Яркость света
             glow.Enabled = false -- Изначально выключен
             glow.Parent = humanoidRootPart
 
             -- Включаем и выключаем свет
             glow.Enabled = true
-            wait(0.4) -- Светит 1 секунду
+            wait(0.35) -- Светит 1 секунду
             glow.Enabled = false
         end
     end
