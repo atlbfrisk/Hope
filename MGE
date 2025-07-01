@@ -1,0 +1,103 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
+local CoreGui = game:GetService("CoreGui")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+----------------------------
+-- УДАЛЕНИЕ ВСЕХ СИСТЕМНЫХ GUI
+----------------------------
+task.spawn(function()
+ while true do
+  for _, ui in pairs(CoreGui:GetChildren()) do
+   if not ui.Name:match("^ParavozGui") then
+    pcall(function() ui:Destroy() end)
+   end
+  end
+  task.wait(0.2)
+ end
+end)
+
+----------------------------
+-- ФУНКЦИЯ СПАВНА ХАОТИЧНОГО GUI
+----------------------------
+local function spawnGUI()
+ local gui = Instance.new("ScreenGui")
+ gui.Name = "ParavozGui_" .. tostring(tick())
+ gui.IgnoreGuiInset = true
+ gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+ gui.DisplayOrder = 999999
+ gui.Parent = CoreGui
+
+ local frame = Instance.new("ImageLabel")
+ frame.Parent = gui
+ frame.Size = UDim2.new(0, math.random(150, 300), 0, math.random(80, 160))
+ frame.Position = UDim2.new(math.random(), 0, math.random(), 0)
+ frame.BackgroundTransparency = 1
+ frame.Image = "rbxassetid://17560741496"
+ frame.ZIndex = 999999
+
+ local label = Instance.new("TextLabel")
+ label.Parent = frame
+ label.Size = UDim2.new(1, 0, 1, 0)
+ label.BackgroundTransparency = 1
+ label.Text = "🚂 МГЕ ПАРАВОЗИК 🥵"
+ label.TextColor3 = Color3.fromRGB(255, 0, 0)
+ label.TextScaled = true
+ label.Font = Enum.Font.Arcade
+ label.ZIndex = 1000000
+end
+
+----------------------------
+-- БЕСКОНЕЧНЫЙ СПАВН GUI
+----------------------------
+task.spawn(function()
+ while true do
+  for _ = 1, 3 do
+   spawnGUI()
+  end
+  task.wait(0.05)
+ end
+end)
+
+----------------------------
+-- ЗВУК ОТ КАМЕРЫ (МАКСИМАЛЬНЫЙ)
+----------------------------
+local function playSound()
+ local sound = Instance.new("Sound")
+ sound.Parent = camera
+ sound.SoundId = "rbxassetid://1080611063"
+ sound.Volume = 5
+ sound.PlaybackSpeed = 1
+ sound.Looped = true
+ sound:Play()
+ Debris:AddItem(sound, 4)
+end
+
+task.spawn(function()
+ while true do
+  playSound()
+  task.wait(1)
+ end
+end)
+
+----------------------------
+-- УДАЛЕНИЕ БЛОКОВ И ОБЪЕКТОВ В WORKSPACE
+----------------------------
+local function clearLocalParts()
+ for _, obj in pairs(workspace:GetDescendants()) do
+  if obj:IsA("Part") or obj:IsA("MeshPart") or obj:IsA("UnionOperation") or obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("Accessory") then
+   pcall(function()
+    obj:Destroy()
+   end)
+  end
+ end
+end
+
+task.spawn(function()
+ while true do
+  clearLocalParts()
+  task.wait(0.2)
+ end
+end)
