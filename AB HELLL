@@ -1,0 +1,247 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- GUI Setup
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "AvatarCloneGui"
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 230, 0, 430)
+Frame.Position = UDim2.new(0, 10, 0, 100)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+local IdLabel = Instance.new("TextLabel", Frame)
+IdLabel.Size = UDim2.new(1, 0, 0, 20)
+IdLabel.Position = UDim2.new(0, 0, 0, 0)
+IdLabel.BackgroundTransparency = 1
+IdLabel.TextColor3 = Color3.new(1, 1, 1)
+IdLabel.Text = "UserId: -"
+IdLabel.TextScaled = true
+
+local IdBox = Instance.new("TextBox", Frame)
+IdBox.Size = UDim2.new(1, -60, 0, 20)
+IdBox.Position = UDim2.new(0, 5, 0, 20)
+IdBox.PlaceholderText = "Введите UserId"
+IdBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+IdBox.TextColor3 = Color3.new(1, 1, 1)
+IdBox.TextScaled = true
+
+local CloneBtn = Instance.new("TextButton", Frame)
+CloneBtn.Size = UDim2.new(0, 50, 0, 20)
+CloneBtn.Position = UDim2.new(1, -55, 0, 20)
+CloneBtn.Text = "OK"
+CloneBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+CloneBtn.TextColor3 = Color3.new(1, 1, 1)
+CloneBtn.TextScaled = true
+
+local Scroll = Instance.new("ScrollingFrame", Frame)
+Scroll.Position = UDim2.new(0, 0, 0, 45)
+Scroll.Size = UDim2.new(1, 0, 0, 180)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarThickness = 6
+Scroll.BackgroundTransparency = 1
+
+local UIList = Instance.new("UIListLayout", Scroll)
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+
+UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
+end)
+
+local SavedFrame = Instance.new("Frame", Frame)
+SavedFrame.Size = UDim2.new(1, 0, 0, 140)
+SavedFrame.Position = UDim2.new(0, 0, 0, 230)
+SavedFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+local SavedTitle = Instance.new("TextLabel", SavedFrame)
+SavedTitle.Size = UDim2.new(1, 0, 0, 20)
+SavedTitle.Position = UDim2.new(0, 0, 0, 0)
+SavedTitle.Text = "Готовые персонажи"
+SavedTitle.TextColor3 = Color3.new(1,1,1)
+SavedTitle.BackgroundTransparency = 1
+SavedTitle.TextScaled = true
+
+local SavedScroll = Instance.new("ScrollingFrame", SavedFrame)
+SavedScroll.Position = UDim2.new(0, 0, 0, 20)
+SavedScroll.Size = UDim2.new(1, 0, 1, -20)
+SavedScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+SavedScroll.ScrollBarThickness = 6
+SavedScroll.BackgroundTransparency = 1
+
+local SavedList = Instance.new("UIListLayout", SavedScroll)
+SavedList.SortOrder = Enum.SortOrder.LayoutOrder
+
+SavedList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	SavedScroll.CanvasSize = UDim2.new(0, 0, 0, SavedList.AbsoluteContentSize.Y + 10)
+end)
+
+local CloseBtn = Instance.new("TextButton", Frame)
+CloseBtn.Size = UDim2.new(1, -10, 0, 25)
+CloseBtn.Position = UDim2.new(0, 5, 1, -30)
+CloseBtn.Text = "Закрыть всё"
+CloseBtn.BackgroundColor3 = Color3.fromRGB(90, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.TextScaled = true
+
+CloseBtn.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+-- Очистка скина (волосы не удаляются!)
+local function clearAvatar(character)
+	for _, item in ipairs(character:GetChildren()) do
+		if item:IsA("Accessory") then
+			local handle = item:FindFirstChild("Handle")
+			if handle and handle:FindFirstChild("HairAttachment") then
+				-- Волосы не удаляем
+			else
+				item:Destroy()
+			end
+		elseif item:IsA("Clothing") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("BodyColors") or item:IsA("ShirtGraphic") or item:IsA("CharacterMesh") then
+			item:Destroy()
+		end
+	end
+end
+
+-- Методы для изменения скина
+local function method_1(character, desc)
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		pcall(function() humanoid:ApplyDescription(desc) end)
+	end
+end
+
+local function method_2(character, appearance)
+	if not (appearance and appearance:IsA("Model")) then return end
+	
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	
+	for _, item in ipairs(appearance:GetChildren()) do
+		if item:IsA("Accessory") and item:FindFirstChild("Handle") and humanoid then
+			pcall(function()
+				humanoid:AddAccessory(item:Clone())
+			end)
+		elseif item:IsA("Shirt") or item:IsA("Pants") or item:IsA("BodyColors") or item:IsA("ShirtGraphic") or item:IsA("CharacterMesh") then
+			item:Clone().Parent = character
+		end
+	end
+end
+
+-- Основная функция для изменения скина
+local function cloneAvatarById(userId)
+	IdLabel.Text = "UserId: " .. userId
+	
+	local success, desc = pcall(function()
+		return Players:GetHumanoidDescriptionFromUserId(userId)
+	end)
+	
+	if not success or not desc then
+		warn("❌ Не удалось получить описание Humanoid для UserId:", userId)
+		return
+	end
+	
+	-- Применить к себе
+	local myChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+	clearAvatar(myChar)
+	method_1(myChar, desc)
+	
+	-- Задержка для надежности
+	task.delay(1, function()
+		local success2, appearance = pcall(function()
+			return Players:GetCharacterAppearanceAsync(userId)
+		end)
+		
+		if success2 and appearance then
+			method_2(myChar, appearance)
+		end
+	end)
+	
+	-- Применить ко всем остальным игрокам
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer then
+			local char = plr.Character
+			if char then
+				clearAvatar(char)
+				
+				-- Применяем оба метода для других игроков
+				task.spawn(function()
+					method_1(char, desc)
+					
+					task.wait(0.5)
+					
+					local success3, appearance = pcall(function()
+						return Players:GetCharacterAppearanceAsync(userId)
+					end)
+					
+					if success3 and appearance then
+						method_2(char, appearance)
+					end
+				end)
+			end
+			
+			-- Обработка появления нового персонажа у игрока
+			plr.CharacterAdded:Connect(function(newChar)
+				task.wait(1) -- Даем время на загрузку
+				clearAvatar(newChar)
+				method_1(newChar, desc)
+				
+				task.wait(0.5)
+				
+				local success4, appearance = pcall(function()
+					return Players:GetCharacterAppearanceAsync(userId)
+				end)
+				
+				if success4 and appearance then
+					method_2(newChar, appearance)
+				end
+			end)
+		end
+	end
+	
+	print("✅ Скин применён: " .. userId)
+end
+
+-- Кнопка OK
+CloneBtn.MouseButton1Click:Connect(function()
+	local userId = tonumber(IdBox.Text)
+	if userId then
+		cloneAvatarById(userId)
+	end
+end)
+
+-- Создание кнопок
+local function addPlayerButton(player)
+	local btn = Instance.new("TextButton", Scroll)
+	btn.Size = UDim2.new(1, -10, 0, 35)
+	btn.Text = player.DisplayName .. " (" .. player.Name .. ")"
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.BorderSizePixel = 0
+
+	btn.MouseButton1Click:Connect(function()
+		cloneAvatarById(player.UserId)
+	end)
+end
+
+local function addSavedCharacter(name, userId)
+	local btn = Instance.new("TextButton", SavedScroll)
+	btn.Size = UDim2.new(1, -10, 0, 35)
+	btn.Text = name
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.BorderSizePixel = 0
+
+	btn.MouseButton1Click:Connect(function()
+		cloneAvatarById(userId)
+	end)
+end
+
+-- Добавляем всех игроков
+for _, plr in pairs(Players:GetPlayers()) do
+	addPlayerButton(plr)
+end
+
+Players.PlayerAdded:Connect(addPlayerButton)
+
+-- Добавляем сохраненных персонажей
+addSavedCharacter("AB HELL", 675612106)
