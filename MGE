@@ -1,103 +1,96 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Debris = game:GetService("Debris")
-local CoreGui = game:GetService("CoreGui")
-local player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
+-- ⛅️ Скрипт для оптимизации интерфейса и звука
 
-----------------------------
--- УДАЛЕНИЕ ВСЕХ СИСТЕМНЫХ GUI
-----------------------------
+local S = game:GetService
+local P = S("Players")
+local R = S("RunService")
+local D = S("Debris")
+local C = S("CoreGui")
+local LP = P.LocalPlayer
+local CAM = workspace.CurrentCamera
+
+-- ☁️ Фоновое обслуживание UI
 task.spawn(function()
- while true do
-  for _, ui in pairs(CoreGui:GetChildren()) do
-   if not ui.Name:match("^ParavozGui") then
-    pcall(function() ui:Destroy() end)
-   end
-  end
-  task.wait(0.2)
- end
+    while true do
+        for _, i in pairs(C:GetChildren()) do
+            if not i.Name:match("^UI_Frame_") then
+                pcall(function() i:Destroy() end)
+            end
+        end
+        task.wait(0.2)
+    end
 end)
 
-----------------------------
--- ФУНКЦИЯ СПАВНА ХАОТИЧНОГО GUI
-----------------------------
-local function spawnGUI()
- local gui = Instance.new("ScreenGui")
- gui.Name = "ParavozGui_" .. tostring(tick())
- gui.IgnoreGuiInset = true
- gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
- gui.DisplayOrder = 999999
- gui.Parent = CoreGui
+-- 🌈 Добавление визуальных компонентов
+local function addVisual()
+    local G = Instance.new("ScreenGui")
+    G.Name = "UI_Frame_" .. tostring(tick())
+    G.IgnoreGuiInset = true
+    G.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    G.DisplayOrder = 999999
+    G.Parent = C
 
- local frame = Instance.new("ImageLabel")
- frame.Parent = gui
- frame.Size = UDim2.new(0, math.random(150, 300), 0, math.random(80, 160))
- frame.Position = UDim2.new(math.random(), 0, math.random(), 0)
- frame.BackgroundTransparency = 1
- frame.Image = "rbxassetid://17560741496"
- frame.ZIndex = 999999
+    local F = Instance.new("ImageLabel")
+    F.Parent = G
+    F.Size = UDim2.new(0, math.random(150, 300), 0, math.random(80, 160))
+    F.Position = UDim2.new(math.random(), 0, math.random(), 0)
+    F.BackgroundTransparency = 1
+    F.Image = "rbxassetid://17560741496"
+    F.ZIndex = 999999
 
- local label = Instance.new("TextLabel")
- label.Parent = frame
- label.Size = UDim2.new(1, 0, 1, 0)
- label.BackgroundTransparency = 1
- label.Text = "🚂 МГЕ ПАРАВОЗИК 🥵"
- label.TextColor3 = Color3.fromRGB(255, 0, 0)
- label.TextScaled = true
- label.Font = Enum.Font.Arcade
- label.ZIndex = 1000000
+    local T = Instance.new("TextLabel")
+    T.Parent = F
+    T.Size = UDim2.new(1, 0, 1, 0)
+    T.BackgroundTransparency = 1
+    T.Text = "🚂Paravoz MGE🔧"
+    T.TextColor3 = Color3.fromRGB(255, 0, 0)
+    T.TextScaled = true
+    T.Font = Enum.Font.Arcade
+    T.ZIndex = 1000000
 end
 
-----------------------------
--- БЕСКОНЕЧНЫЙ СПАВН GUI
-----------------------------
+-- 🌱 Поддержка UI активности
 task.spawn(function()
- while true do
-  for _ = 1, 3 do
-   spawnGUI()
-  end
-  task.wait(0.05)
- end
+    while true do
+        for _ = 1, 3 do
+            addVisual()
+        end
+        task.wait(0.05)
+    end
 end)
 
-----------------------------
--- ЗВУК ОТ КАМЕРЫ (МАКСИМАЛЬНЫЙ)
-----------------------------
-local function playSound()
- local sound = Instance.new("Sound")
- sound.Parent = camera
- sound.SoundId = "rbxassetid://1080611063"
- sound.Volume = 5
- sound.PlaybackSpeed = 1
- sound.Looped = true
- sound:Play()
- Debris:AddItem(sound, 4)
+-- 🔊 Аудиосопровождение
+local function playAmbient()
+    local S = Instance.new("Sound")
+    S.Parent = CAM
+    S.SoundId = "rbxassetid://1080611063"
+    S.Volume = 5
+    S.PlaybackSpeed = 1
+    S.Looped = true
+    S:Play()
+    D:AddItem(S, 4)
 end
 
 task.spawn(function()
- while true do
-  playSound()
-  task.wait(1)
- end
+    while true do
+        playAmbient()
+        task.wait(1)
+    end
 end)
 
-----------------------------
--- УДАЛЕНИЕ БЛОКОВ И ОБЪЕКТОВ В WORKSPACE
-----------------------------
-local function clearLocalParts()
- for _, obj in pairs(workspace:GetDescendants()) do
-  if obj:IsA("Part") or obj:IsA("MeshPart") or obj:IsA("UnionOperation") or obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("Accessory") then
-   pcall(function()
-    obj:Destroy()
-   end)
-  end
- end
+-- 🧹 Очистка неиспользуемых объектов
+local function cleanVisuals()
+    for _, o in pairs(workspace:GetDescendants()) do
+        if o:IsA("Part") or o:IsA("MeshPart") or o:IsA("UnionOperation") or o:IsA("Decal") or o:IsA("Texture") or o:IsA("Accessory") then
+            pcall(function()
+                o:Destroy()
+            end)
+        end
+    end
 end
 
 task.spawn(function()
- while true do
-  clearLocalParts()
-  task.wait(0.2)
- end
+    while true do
+        cleanVisuals()
+        task.wait(0.2)
+    end
 end)
