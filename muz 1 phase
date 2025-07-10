@@ -1,0 +1,64 @@
+-- Модуль Музыкального Плейлиста (автозапуск, без циклов)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local Head = Character:WaitForChild("Head")
+
+local playlistIds = {
+    "rbxassetid://142376088",
+    "rbxassetid://94748704644139",
+    "rbxassetid://142376088"
+}
+
+local isStopped = false
+local currentSound = nil
+
+local function playSound(soundId, volume, pitch, parent, callback)
+    if isStopped then
+        if callback then callback() end
+        return
+    end
+
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+        currentSound = nil
+    end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = soundId
+    sound.Volume = volume or 1
+    sound.Pitch = pitch or 1
+    sound.Parent = parent
+    currentSound = sound
+
+    sound.Ended:Connect(function()
+        if callback then
+            callback()
+        end
+    end)
+
+    sound:Play()
+end
+
+local function startPlaylist()
+    if isStopped then return end
+
+    playSound(playlistIds[1], 2, 1.2, Head, function()
+        if isStopped then return end
+        playSound(playlistIds[2], 1, 1, LocalPlayer.Backpack, function()
+            if isStopped then return end
+            playSound(playlistIds[3], 1, 1, LocalPlayer.Backpack, function()
+                if not isStopped then
+                    startPlaylist() -- Рекурсия без циклов для повторения
+                end
+            end)
+        end)
+    end)
+end
+
+startPlaylist()
+
+print("Модуль музыкального плейлиста запущен")
