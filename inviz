@@ -1,0 +1,126 @@
+local key = Enum.KeyCode.X -- key to toggle invisibility
+
+-- Не редактируй ниже без необходимости
+local invis_on = false
+
+-- Создание GUI
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "InvisGUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 160, 0, 60)
+frame.Position = UDim2.new(0.5, -80, 0.5, -30) -- по центру
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 100, 0, 40)
+toggleButton.Position = UDim2.new(0, 5, 0, 10)
+toggleButton.Text = "Surprise"
+toggleButton.BackgroundColor3 = Color3.fromRGB(128, 0, 255)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 0)
+toggleButton.Font = Enum.Font.SourceSans
+toggleButton.TextSize = 24
+toggleButton.TextStrokeTransparency = 0.5
+toggleButton.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Parent = frame
+
+-- Кнопка замка
+local lockButton = Instance.new("TextButton")
+lockButton.Size = UDim2.new(0, 40, 0, 40)
+lockButton.Position = UDim2.new(1, -45, 0, 10)
+lockButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+lockButton.Text = "🔓"
+lockButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+lockButton.Font = Enum.Font.SourceSansBold
+lockButton.TextSize = 20
+lockButton.Parent = frame
+
+-- Переменная блокировки
+local guiLocked = false
+
+lockButton.MouseButton1Click:Connect(function()
+    guiLocked = not guiLocked
+    frame.Draggable = not guiLocked
+    lockButton.Text = guiLocked and "🔒" or "🔓"
+end)
+
+-- Звук
+local sound = Instance.new("Sound", player:WaitForChild("PlayerGui"))
+sound.SoundId = "rbxassetid://942127495"
+sound.Volume = 1
+
+-- Функция прозрачности
+local function setTransparency(character, transparency)
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = transparency
+        end
+    end
+end
+
+-- Инвиз
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local originalWalkSpeed = humanoid.WalkSpeed
+local speedMultiplier = 15
+
+local function toggleInvisibility()
+    invis_on = not invis_on
+    sound:Play()
+
+    if invis_on then
+        local savedpos = humanoid.RootPart.CFrame
+        task.wait()
+
+        local newPosition = savedpos.Position - (savedpos.LookVector * 10000)
+        character:MoveTo(newPosition)
+
+        task.wait(0.15)
+        local Seat = Instance.new('Seat', workspace)
+        Seat.Anchored = false
+        Seat.CanCollide = false
+        Seat.Name = 'invischair'
+        Seat.Transparency = 1
+        Seat.Position = Vector3.new(-25.95, 84, 35370.55)
+        local Weld = Instance.new("Weld", Seat)
+        Weld.Part0 = Seat
+        Weld.Part1 = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+        Seat.CFrame = savedpos
+
+        setTransparency(character, 0.5)
+
+        while invis_on do
+            humanoid.WalkSpeed = originalWalkSpeed * speedMultiplier
+            task.wait(0.1)
+        end
+
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Invis On";
+            Duration = 1;
+            Text = "";
+        })
+    else
+        local invisChair = workspace:FindFirstChild('invischair')
+        if invisChair then
+            invisChair:Destroy()
+        end
+
+        setTransparency(character, 0)
+        humanoid.WalkSpeed = originalWalkSpeed
+
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Invis Off";
+            Duration = 1;
+            Text = "";
+        })
+    end
+end
+
+toggleButton.MouseButton1Click:Connect(toggleInvisibility)
