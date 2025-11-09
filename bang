@@ -1,12 +1,11 @@
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+
 local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
+local playerGui = player:WaitForChild("PlayerGui")
 
-local attachmentNames = {"1", "2", "3", "4", "5", "6", "7"}
-local attachments = {}
-
+local attachmentNames = {"1","2","3","4","5","6","7"}
 local spacing = 2.5
 local forwardAmplitude = 7
 local moveSpeed = 1.2
@@ -17,126 +16,213 @@ local customOffsets = {
 	[2] = Vector3.new(-2.5, 0, 13.5),
 	[3] = Vector3.new(2.5, 0, 16),
 	[4] = Vector3.new(0, 0, 16),
-	[5] = Vector3.new(-1, 0, 16),
-	[6] = Vector3.new(1, 0, 16),
-	[7] = Vector3.new(0, 0, 17)
+	[5] = Vector3.new(0, 0, 16),
+	[6] = Vector3.new(0, 0, 16),
+	[7] = Vector3.new(0, 0, 16),
 }
 
-for i, name in ipairs(attachmentNames) do
-	local attachment = rootPart:FindFirstChild(name)
-	if attachment then
-		local offsetZ = -spacing * i
-		local basePos = Vector3.new(0, initialOffsetY, offsetZ)
-		local custom = customOffsets[i] or Vector3.zero
-		attachment.Position = basePos + custom
-		attachments[i] = {
-			ref = attachment,
-			baseOffset = basePos,
-			customOffset = custom,
-		}
+local character = player.Character or player.CharacterAdded:Wait()
+local localRoot = character:WaitForChild("HumanoidRootPart")
+local attachments = {}
+
+local attachedTo = localRoot
+local time = 0
+
+local function initAttachmentsForRoot(root)
+	attachments = {}
+	for i, name in ipairs(attachmentNames) do
+		local att = root:FindFirstChild(name)
+		if att and att:IsA("Attachment") then
+			local base = Vector3.new(0, initialOffsetY, -spacing * i)
+			local custom = customOffsets[i] or Vector3.new(0,0,0)
+			att.Position = base + custom
+			table.insert(attachments, {
+				index = i,
+				ref = att,
+				baseOffset = base,
+				customOffset = custom,
+			})
+		else
+			warn("Attachment '"..tostring(name).."' не найден в "..tostring(root))
+		end
 	end
 end
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "AttachGUI"
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
+initAttachmentsForRoot(localRoot)
+attachedTo = localRoot
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 250)
-frame.Position = UDim2.new(0.5, -100, 0.5, -125)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TailAttachGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 240, 0, 260)
+mainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(28,28,30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Выбор игрока"
-title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Parent = frame
+title.BackgroundColor3 = Color3.fromRGB(36,36,40)
+title.BorderSizePixel = 0
+title.Text = "Прикрепить хвост"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(225,225,225)
+title.Parent = mainFrame
 
 local playerList = Instance.new("ScrollingFrame")
-playerList.Size = UDim2.new(1, 0, 1, -70)
-playerList.Position = UDim2.new(0, 0, 0, 30)
-playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
+playerList.Size = UDim2.new(1, -14, 1, -80)
+playerList.Position = UDim2.new(0, 7, 0, 36)
+playerList.BackgroundTransparency = 1
 playerList.ScrollBarThickness = 6
-playerList.Parent = frame
+playerList.Parent = mainFrame
 
-local attachBtn = Instance.new("TextButton")
-attachBtn.Size = UDim2.new(1, -10, 0, 30)
-attachBtn.Position = UDim2.new(0, 5, 1, -35)
-attachBtn.Text = "Прикрепить"
-attachBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 70)
-attachBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-attachBtn.Parent = frame
+local uiList = Instance.new("UIListLayout")
+uiList.Padding = UDim.new(0,6)
+uiList.Parent = playerList
+
+local attachButton = Instance.new("TextButton")
+attachButton.Size = UDim2.new(1, -14, 0, 36)
+attachButton.Position = UDim2.new(0, 7, 1, -40)
+attachButton.BackgroundColor3 = Color3.fromRGB(70,130,255)
+attachButton.Font = Enum.Font.GothamBold
+attachButton.TextSize = 15
+attachButton.TextColor3 = Color3.new(1,1,1)
+attachButton.Text = "Прикрепить"
+attachButton.Parent = mainFrame
 
 local selectedPlayer = nil
+local buttonsByUserId = {}
 
-local function refreshPlayerList()
-	for _, child in ipairs(playerList:GetChildren()) do
-		if child:IsA("TextButton") then
-			child:Destroy()
+uiList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	playerList.CanvasSize = UDim2.new(0, 0, 0, uiList.AbsoluteContentSize.Y + 8)
+end)
+
+local function createButtonForPlayer(plr)
+	if buttonsByUserId[plr.UserId] then return end
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, -8, 0, 28)
+	btn.BackgroundColor3 = Color3.fromRGB(44,44,50)
+	btn.TextColor3 = Color3.fromRGB(230,230,230)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.Text = plr.Name
+	btn.Parent = playerList
+
+	btn.MouseButton1Click:Connect(function()
+		if selectedPlayer and buttonsByUserId[selectedPlayer.UserId] then
+			buttonsByUserId[selectedPlayer.UserId].BackgroundColor3 = Color3.fromRGB(44,44,50)
 		end
-	end
-	local y = 0
-	for _, plr in ipairs(Players:GetPlayers()) do
-		if plr ~= player then
-			local btn = Instance.new("TextButton")
-			btn.Size = UDim2.new(1, -10, 0, 25)
-			btn.Position = UDim2.new(0, 5, 0, y)
-			btn.Text = plr.Name
-			btn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-			btn.Parent = playerList
-			btn.MouseButton1Click:Connect(function()
-				selectedPlayer = plr
-				for _, other in ipairs(playerList:GetChildren()) do
-					if other:IsA("TextButton") then
-						other.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-					end
-				end
-				btn.BackgroundColor3 = Color3.fromRGB(120, 160, 120)
-			end)
-			y += 30
-		end
-	end
-	playerList.CanvasSize = UDim2.new(0, 0, 0, y)
+		selectedPlayer = plr
+		btn.BackgroundColor3 = Color3.fromRGB(90,130,255)
+	end)
+
+	buttonsByUserId[plr.UserId] = btn
 end
 
-Players.PlayerAdded:Connect(refreshPlayerList)
-Players.PlayerRemoving:Connect(refreshPlayerList)
-refreshPlayerList()
+local function removeButtonForPlayer(plr)
+	local btn = buttonsByUserId[plr.UserId]
+	if btn then
+		btn:Destroy()
+		buttonsByUserId[plr.UserId] = nil
+		if selectedPlayer == plr then
+			selectedPlayer = nil
+		end
+	end
+end
 
-local function attachToPlayer(target)
-	if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then
+for _, pl in ipairs(Players:GetPlayers()) do
+	if pl ~= player then
+		createButtonForPlayer(pl)
+	end
+end
+
+Players.PlayerAdded:Connect(function(plr)
+	if plr ~= player then
+		createButtonForPlayer(plr)
+	end
+end)
+Players.PlayerRemoving:Connect(function(plr)
+	removeButtonForPlayer(plr)
+end)
+
+local function attachTailToRoot(targetRoot)
+	if not targetRoot then return end
+
+	for _, item in ipairs(attachments) do
+		local att = item.ref
+		if att then
+			att.Parent = targetRoot
+			local base = Vector3.new(0, initialOffsetY, -spacing * item.index)
+			item.baseOffset = base
+			att.Position = base + item.customOffset
+		end
+	end
+
+	attachedTo = targetRoot
+end
+
+local function returnTailToLocal()
+	local localChar = player.Character
+	if not localChar then return end
+	local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+	if not localHRP then return end
+
+	for _, item in ipairs(attachments) do
+		local att = item.ref
+		if att then
+			att.Parent = localHRP
+			item.baseOffset = Vector3.new(0, initialOffsetY, -spacing * item.index)
+			att.Position = item.baseOffset + item.customOffset
+		end
+	end
+	attachedTo = localHRP
+end
+
+attachButton.MouseButton1Click:Connect(function()
+	if not selectedPlayer then
 		return
 	end
 
-	local targetRoot = target.Character.HumanoidRootPart
-	for i, data in ipairs(attachments) do
-		if data and data.ref then
-			data.ref.Parent = targetRoot
-			data.ref.Position = Vector3.new(0, initialOffsetY, -spacing * i)
-		end
+	local tChar = selectedPlayer.Character
+	local tRoot = (tChar and tChar:FindFirstChild("HumanoidRootPart")) and tChar.HumanoidRootPart or nil
+	if not tRoot then
+		warn("Нельзя прикрепить — у игрока нет HumanoidRootPart")
+		return
 	end
-end
 
-attachBtn.MouseButton1Click:Connect(function()
+	attachTailToRoot(tRoot)
+
 	if selectedPlayer then
-		attachToPlayer(selectedPlayer)
+		selectedPlayer.CharacterRemoving:Connect(function()
+			returnTailToLocal()
+		end)
 	end
 end)
 
-local time = 0
 RunService.RenderStepped:Connect(function(dt)
-	time += dt * moveSpeed
-	local offsetZ = math.sin(time) * forwardAmplitude
-	for _, data in ipairs(attachments) do
-		if data and data.ref then
-			local newLocal = data.baseOffset + data.customOffset + Vector3.new(0, 0, offsetZ)
-			data.ref.Position = newLocal
+	if #attachments == 0 then return end
+	time = time + dt * moveSpeed
+	local globalZ = math.sin(time) * forwardAmplitude
+
+	for _, item in ipairs(attachments) do
+		local att = item.ref
+		if att and att.Parent then
+			local targetLocal = item.baseOffset + item.customOffset + Vector3.new(0, 0, globalZ)
+			att.Position = targetLocal
 		end
+	end
+end)
+
+player.CharacterAdded:Connect(function(char)
+	char:WaitForChild("HumanoidRootPart", 5)
+	localRoot = char:FindFirstChild("HumanoidRootPart") or localRoot
+	if attachedTo == nil or attachedTo == localRoot then
+		returnTailToLocal()
 	end
 end)
