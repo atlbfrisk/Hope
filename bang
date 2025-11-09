@@ -1,0 +1,142 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local attachmentNames = {"1", "2", "3", "4", "5", "6", "7"}
+local attachments = {}
+
+local spacing = 2.5
+local forwardAmplitude = 7
+local moveSpeed = 1.2
+local initialOffsetY = -2
+
+local customOffsets = {
+	[1] = Vector3.new(0, 0, 12.5),
+	[2] = Vector3.new(-2.5, 0, 13.5),
+	[3] = Vector3.new(2.5, 0, 16),
+	[4] = Vector3.new(0, 0, 16),
+	[5] = Vector3.new(-1, 0, 16),
+	[6] = Vector3.new(1, 0, 16),
+	[7] = Vector3.new(0, 0, 17)
+}
+
+for i, name in ipairs(attachmentNames) do
+	local attachment = rootPart:FindFirstChild(name)
+	if attachment then
+		local offsetZ = -spacing * i
+		local basePos = Vector3.new(0, initialOffsetY, offsetZ)
+		local custom = customOffsets[i] or Vector3.zero
+		attachment.Position = basePos + custom
+		attachments[i] = {
+			ref = attachment,
+			baseOffset = basePos,
+			customOffset = custom,
+		}
+	end
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AttachGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 250)
+frame.Position = UDim2.new(0.5, -100, 0.5, -125)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Выбор игрока"
+title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = frame
+
+local playerList = Instance.new("ScrollingFrame")
+playerList.Size = UDim2.new(1, 0, 1, -70)
+playerList.Position = UDim2.new(0, 0, 0, 30)
+playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
+playerList.ScrollBarThickness = 6
+playerList.Parent = frame
+
+local attachBtn = Instance.new("TextButton")
+attachBtn.Size = UDim2.new(1, -10, 0, 30)
+attachBtn.Position = UDim2.new(0, 5, 1, -35)
+attachBtn.Text = "Прикрепить"
+attachBtn.BackgroundColor3 = Color3.fromRGB(70, 120, 70)
+attachBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+attachBtn.Parent = frame
+
+local selectedPlayer = nil
+
+local function refreshPlayerList()
+	for _, child in ipairs(playerList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+	local y = 0
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= player then
+			local btn = Instance.new("TextButton")
+			btn.Size = UDim2.new(1, -10, 0, 25)
+			btn.Position = UDim2.new(0, 5, 0, y)
+			btn.Text = plr.Name
+			btn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			btn.Parent = playerList
+			btn.MouseButton1Click:Connect(function()
+				selectedPlayer = plr
+				for _, other in ipairs(playerList:GetChildren()) do
+					if other:IsA("TextButton") then
+						other.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+					end
+				end
+				btn.BackgroundColor3 = Color3.fromRGB(120, 160, 120)
+			end)
+			y += 30
+		end
+	end
+	playerList.CanvasSize = UDim2.new(0, 0, 0, y)
+end
+
+Players.PlayerAdded:Connect(refreshPlayerList)
+Players.PlayerRemoving:Connect(refreshPlayerList)
+refreshPlayerList()
+
+local function attachToPlayer(target)
+	if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then
+		return
+	end
+
+	local targetRoot = target.Character.HumanoidRootPart
+	for i, data in ipairs(attachments) do
+		if data and data.ref then
+			data.ref.Parent = targetRoot
+			data.ref.Position = Vector3.new(0, initialOffsetY, -spacing * i)
+		end
+	end
+end
+
+attachBtn.MouseButton1Click:Connect(function()
+	if selectedPlayer then
+		attachToPlayer(selectedPlayer)
+	end
+end)
+
+local time = 0
+RunService.RenderStepped:Connect(function(dt)
+	time += dt * moveSpeed
+	local offsetZ = math.sin(time) * forwardAmplitude
+	for _, data in ipairs(attachments) do
+		if data and data.ref then
+			local newLocal = data.baseOffset + data.customOffset + Vector3.new(0, 0, offsetZ)
+			data.ref.Position = newLocal
+		end
+	end
+end)
