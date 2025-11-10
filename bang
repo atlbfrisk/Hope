@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -24,7 +23,6 @@ local customOffsets = {
 local character = player.Character or player.CharacterAdded:Wait()
 local localRoot = character:WaitForChild("HumanoidRootPart")
 local attachments = {}
-
 local attachedTo = localRoot
 local time = 0
 
@@ -153,7 +151,6 @@ end)
 
 local function attachTailToRoot(targetRoot)
 	if not targetRoot then return end
-
 	for _, item in ipairs(attachments) do
 		local att = item.ref
 		if att then
@@ -163,7 +160,6 @@ local function attachTailToRoot(targetRoot)
 			att.Position = base + item.customOffset
 		end
 	end
-
 	attachedTo = targetRoot
 end
 
@@ -172,12 +168,11 @@ local function returnTailToLocal()
 	if not localChar then return end
 	local localHRP = localChar:FindFirstChild("HumanoidRootPart")
 	if not localHRP then return end
-
 	for _, item in ipairs(attachments) do
 		local att = item.ref
 		if att then
 			att.Parent = localHRP
-			item.baseOffset = Vector3.new(0, initialOffsetY, -spacing * item.index)
+			item.baseOffset = Vector3.new(0, initialOffsetY, 0)
 			att.Position = item.baseOffset + item.customOffset
 		end
 	end
@@ -185,19 +180,11 @@ local function returnTailToLocal()
 end
 
 attachButton.MouseButton1Click:Connect(function()
-	if not selectedPlayer then
-		return
-	end
-
+	if not selectedPlayer then return end
 	local tChar = selectedPlayer.Character
 	local tRoot = (tChar and tChar:FindFirstChild("HumanoidRootPart")) and tChar.HumanoidRootPart or nil
-	if not tRoot then
-		warn("Нельзя прикрепить — у игрока нет HumanoidRootPart")
-		return
-	end
-
+	if not tRoot then return end
 	attachTailToRoot(tRoot)
-
 	if selectedPlayer then
 		selectedPlayer.CharacterRemoving:Connect(function()
 			returnTailToLocal()
@@ -207,13 +194,14 @@ end)
 
 RunService.RenderStepped:Connect(function(dt)
 	if #attachments == 0 then return end
-	time = time + dt * moveSpeed
-	local globalZ = math.sin(time) * forwardAmplitude
+	time += dt * moveSpeed
 
+	local globalZ = attachedTo == localRoot and 0 or math.sin(time) * forwardAmplitude
 	for _, item in ipairs(attachments) do
 		local att = item.ref
 		if att and att.Parent then
-			local targetLocal = item.baseOffset + item.customOffset + Vector3.new(0, 0, globalZ)
+			local baseZ = attachedTo == localRoot and 0 or -spacing * item.index
+			local targetLocal = Vector3.new(0, initialOffsetY, baseZ) + item.customOffset + Vector3.new(0, 0, globalZ)
 			att.Position = targetLocal
 		end
 	end
