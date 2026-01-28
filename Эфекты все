@@ -164,7 +164,7 @@ print("✅ Эффект minosground активирован!")]]
         effects = {
             {
                 name = "scenespawn (OBJECT)",
-                desc = "Спавн сцены на персонаже",
+                desc = "отдедение экрана персоонажа",
                 code = [[local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
@@ -179,7 +179,7 @@ print("✅ Эффект scenespawn активирован!")]]
             },
             {
                 name = "InstantSpawn (OBJECT)",
-                desc = "Мгновенный спавн",
+                desc = "Хил",
                 code = [[local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
@@ -190,7 +190,7 @@ local hrp = character:WaitForChild("HumanoidRootPart")
 
 EffectsModule.InstantSpawn(hrp)
 
-print("✅ Эффект мгновенного спавна активирован!")]]
+print("✅ Готово")]]
             }
         }
     },
@@ -200,7 +200,7 @@ print("✅ Эффект мгновенного спавна активирова
         effects = {
             {
                 name = "vergilglass (NONE)",
-                desc = "Стеклянный эффект Вергилия",
+                desc = "полосы вергаля",
                 code = [[local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
@@ -211,7 +211,7 @@ print("✅ Эффект vergilglass активирован!")]]
             },
             {
                 name = "disceffect (CFRAME)",
-                desc = "Эффект вращающегося диска",
+                desc = "ульта старого кроса",
                 code = [[local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
