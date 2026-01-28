@@ -1,202 +1,405 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
+local function copyToClipboard(text, effectName)
+    if toclipboard then
+        toclipboard(text)
+        print("✅ Скрипт '" .. effectName .. "' скопирован в буфер обмена!")
+        for _, frame in pairs(script.Parent:GetDescendants()) do
+            if frame:IsA("TextLabel") and frame.Text == effectName then
+                local originalColor = frame.TextColor3
+                frame.TextColor3 = Color3.new(0, 1, 0)
+                wait(0.5)
+                frame.TextColor3 = originalColor
+                break
+            end
+        end
+    else
+        print("⚠️ Функция toclipboard недоступна")
+        print("Текст для копирования:")
+        print(string.rep("-", 40))
+        print(text)
+        print(string.rep("-", 40))
+    end
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "EffectsCopyKit"
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local mainContainer = Instance.new("Frame")
+mainContainer.Size = UDim2.new(0, 300, 0, 400)
+mainContainer.Position = UDim2.new(0.5, -200, 1, -300)
+mainContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+mainContainer.BackgroundColor3 = Color3.fromRGB(25, 30, 40)
+mainContainer.BorderSizePixel = 2
+mainContainer.BorderColor3 = Color3.fromRGB(50, 60, 70)
+mainContainer.Parent = screenGui
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 50)
+titleBar.BackgroundColor3 = Color3.fromRGB(35, 40, 55)
+titleBar.Parent = mainContainer
+
+local title = Instance.new("TextLabel")
+title.Text = "🎮 ЭФФЕКТЫ ДЛЯ КОПИРОВАНИЯ"
+title.Size = UDim2.new(1, -60, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 220, 100)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+local hideButton = Instance.new("TextButton")
+hideButton.Text = "⬇"
+hideButton.Size = UDim2.new(0, 40, 0, 40)
+hideButton.Position = UDim2.new(1, -45, 0.5, -20)
+hideButton.AnchorPoint = Vector2.new(0, 0.5)
+hideButton.BackgroundColor3 = Color3.fromRGB(70, 80, 100)
+hideButton.TextColor3 = Color3.new(1, 1, 1)
+hideButton.Font = Enum.Font.SourceSansBold
+hideButton.TextSize = 18
+hideButton.Parent = titleBar
+
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -20, 1, -70)
+scrollFrame.Position = UDim2.new(0, 10, 0, 60)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 45)
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.Parent = mainContainer
+
+local categories = {
+    {
+        name = "💥 ЭФФЕКТЫ УДАРА",
+        color = Color3.fromRGB(255, 100, 100),
+        effects = {
+            {
+                name = "groundhit (CFRAME)",
+                desc = "Удар земли - базовая версия",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
 local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local hrp = character:WaitForChild("HumanoidRootPart")
 
-local workingFunctions = {
-    {
-        name = "ImaginaryPurple",
-        params = {
-            {name = "Без параметров", call = function() EffectsModule.ImaginaryPurple() end},
-            {name = "С позицией и числом", call = function() EffectsModule.ImaginaryPurple(hrp.Position, 3) end}
+EffectsModule.groundhit(hrp.CFrame)
+
+print("✅ Эффект groundhit активирован!")]]
+            },
+            {
+                name = "groundhit (FULL)",
+                desc = "Удар земли с параметрами",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.groundhit(
+    hrp.CFrame,
+    "Ground Impact!",
+    Color3.new(1, 0, 0),
+    5,
+    true
+)
+
+print("✅ Эффект groundhit (полный) активирован!")]]
+            },
+            {
+                name = "groundhit2 (CFRAME)",
+                desc = "Улучшенный удар земли",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.groundhit2(hrp.CFrame)
+
+print("✅ Эффект groundhit2 активирован!")]]
+            },
+            {
+                name = "kbeffect (CFRAME)",
+                desc = "Эффект отбрасывания",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.kbeffect(hrp.CFrame)
+
+print("✅ Эффект knockback активирован!")]]
+            },
+            {
+                name = "minosground (CFRAME)",
+                desc = "Эффект земли Миноса",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.minosground(hrp.CFrame)
+
+print("✅ Эффект minosground активирован!")]]
+            }
         }
     },
     {
-        name = "InstantSpawn",
-        params = {
-            {name = "С CFrame", call = function() EffectsModule.InstantSpawn(hrp.CFrame) end}
+        name = "✨ ЭФФЕКТЫ СПАВНА",
+        color = Color3.fromRGB(100, 200, 255),
+        effects = {
+            {
+                name = "scenespawn (OBJECT)",
+                desc = "Спавн сцены на персонаже",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.scenespawn(hrp)
+
+print("✅ Эффект scenespawn активирован!")]]
+            },
+            {
+                name = "InstantSpawn (OBJECT)",
+                desc = "Мгновенный спавн",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.InstantSpawn(hrp)
+
+print("✅ Эффект мгновенного спавна активирован!")]]
+            }
         }
     },
     {
-        name = "bigcircleparticleeffect",
-        params = {
-            {name = "С числом", call = function() EffectsModule.bigcircleparticleeffect(5) end},
-            {name = "Со строкой", call = function() EffectsModule.bigcircleparticleeffect("test") end},
-            {name = "Полный набор", call = function() EffectsModule.bigcircleparticleeffect(hrp.CFrame, "fire", Color3.new(1,0,0), 5, true) end}
+        name = "🎭 СПЕЦЭФФЕКТЫ",
+        color = Color3.fromRGB(180, 100, 255),
+        effects = {
+            {
+                name = "vergilglass (NONE)",
+                desc = "Стеклянный эффект Вергилия",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+
+EffectsModule.vergilglass()
+
+print("✅ Эффект vergilglass активирован!")]]
+            },
+            {
+                name = "disceffect (CFRAME)",
+                desc = "Эффект вращающегося диска",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.disceffect(hrp.CFrame)
+
+print("✅ Эффект disceffect активирован!")]]
+            },
+            {
+                name = "ChangeSky (NONE)",
+                desc = "Изменение неба",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+
+EffectsModule.ChangeSky()
+
+print("✅ Эффект изменения неба активирован!")]]
+            },
+            {
+                name = "ChangeSky (CFRAME)",
+                desc = "Изменение неба с позицией",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.ChangeSky(hrp.CFrame)
+
+print("✅ Эффект изменения неба (с позицией) активирован!")]]
+            }
         }
     },
     {
-        name = "blastereffect",
-        params = {
-            {name = "CFrame + число", call = function() EffectsModule.blastereffect(hrp.CFrame, 5) end}
-        }
-    },
-    {
-        name = "boxeffect",
-        params = {
-            {name = "Объект + CFrame", call = function() EffectsModule.boxeffect(hrp, hrp.CFrame) end},
-            {name = "Полный набор", call = function() EffectsModule.boxeffect(hrp.CFrame, "fire", Color3.new(1,0,0), 5, true) end}
-        }
-    },
-    {
-        name = "circleparticleeffect",
-        params = {
-            {name = "Без параметров", call = function() EffectsModule.circleparticleeffect() end},
-            {name = "С объектом", call = function() EffectsModule.circleparticleeffect(hrp) end},
-            {name = "Со строкой", call = function() EffectsModule.circleparticleeffect("test") end}
-        }
-    },
-    {
-        name = "disceffect",
-        params = {
-            {name = "CFrame + цвет + число", call = function() EffectsModule.disceffect(hrp.CFrame, Color3.new(1,0,1), 10) end}
-        }
-    },
-    {
-        name = "fireeffect",
-        params = {
-            {name = "С позицией", call = function() EffectsModule.fireeffect(hrp.Position) end},
-            {name = "С объектом", call = function() EffectsModule.fireeffect(hrp) end}
-        }
-    },
-    {
-        name = "groundDebris",
-        params = {
-            {name = "С позицией", call = function() EffectsModule.groundDebris(hrp.Position) end},
-            {name = "Позиция + число", call = function() EffectsModule.groundDebris(hrp.Position, 3) end}
-        }
-    },
-    {
-        name = "groundhit2",
-        params = {
-            {name = "Объект + цвет", call = function() EffectsModule.groundhit2(hrp, Color3.new(0,1,0)) end},
-            {name = "Полный набор", call = function() EffectsModule.groundhit2(hrp.CFrame, "fire", Color3.new(1,0,0), 5, true) end}
-        }
-    },
-    {
-        name = "minosground",
-        params = {
-            {name = "С CFrame", call = function() EffectsModule.minosground(hrp.CFrame) end},
-            {name = "CFrame + цвет", call = function() EffectsModule.minosground(hrp.CFrame, Color3.new(1,0,0)) end},
-            {name = "CFrame + число", call = function() EffectsModule.minosground(hrp.CFrame, 5) end},
-            {name = "CFrame + цвет + число", call = function() EffectsModule.minosground(hrp.CFrame, Color3.new(1,0,1), 10) end},
-            {name = "Полный набор", call = function() EffectsModule.minosground(hrp.CFrame, "fire", Color3.new(1,0,0), 5, true) end}
-        }
-    },
-    {
-        name = "scenespawn",
-        params = {
-            {name = "С объектом", call = function() EffectsModule.scenespawn(hrp) end},
-            {name = "Объект + цвет", call = function() EffectsModule.scenespawn(hrp, Color3.new(0,1,0)) end},
-            {name = "Объект + CFrame", call = function() EffectsModule.scenespawn(hrp, hrp.CFrame) end}
-        }
-    },
-    {
-        name = "slasheffect",
-        params = {
-            {name = "CFrame + цвет", call = function() EffectsModule.slasheffect(hrp.CFrame, Color3.new(1,0,0)) end}
-        }
-    },
-    {
-        name = "smallparticleeffect",
-        params = {
-            {name = "CFrame + число", call = function() EffectsModule.smallparticleeffect(hrp.CFrame, 5) end},
-            {name = "CFrame + цвет + число", call = function() EffectsModule.smallparticleeffect(hrp.CFrame, Color3.new(1,0,1), 10) end}
-        }
-    },
-    {
-        name = "warning",
-        params = {
-            {name = "Со строкой", call = function() EffectsModule.warning("test") end}
+        name = "⚡ ПОЛНЫЕ ВЕРСИИ",
+        color = Color3.fromRGB(255, 180, 50),
+        effects = {
+            {
+                name = "groundhit2 (FULL)",
+                desc = "Полная версия groundhit2",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.groundhit2(
+    hrp.CFrame,
+    "Ground Hit 2!",
+    Color3.new(0, 0.5, 1),
+    3,
+    true
+)
+
+print("✅ Эффект groundhit2 (полная версия) активирован!")]]
+            },
+            {
+                name = "kbeffect (FULL)",
+                desc = "Полная версия knockback",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.kbeffect(
+    hrp.CFrame,
+    "Knockback!",
+    Color3.new(1, 1, 0),
+    10,
+    false
+)
+
+print("✅ Эффект knockback (полная версия) активирован!")]]
+            },
+            {
+                name = "minosground (FULL)",
+                desc = "Полная версия minosground",
+                code = [[local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+EffectsModule.minosground(
+    hrp.CFrame,
+    "Minos Ground!",
+    Color3.new(0.5, 0, 0.5),
+    7,
+    true
+)
+
+print("✅ Эффект minosground (полная версия) активирован!")]]
+            }
         }
     }
 }
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RealEffectsGUI"
-screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 380, 0, 550)
-mainFrame.Position = UDim2.new(0, 10, 0.5, -275)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 45)
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
-
-local title = Instance.new("TextLabel")
-title.Text = "✅ РЕАЛЬНЫЕ ЭФФЕКТЫ (15)"
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundColor3 = Color3.fromRGB(45, 50, 65)
-title.TextColor3 = Color3.fromRGB(255, 220, 100)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 18
-title.Parent = mainFrame
-
-local stats = Instance.new("TextLabel")
-stats.Text = "📊 165 частиц создано | 0 объектов"
-stats.Size = UDim2.new(1, 0, 0, 25)
-stats.Position = UDim2.new(0, 0, 0, 40)
-stats.BackgroundColor3 = Color3.fromRGB(50, 55, 70)
-stats.TextColor3 = Color3.fromRGB(180, 255, 180)
-stats.Font = Enum.Font.SourceSansBold
-stats.TextSize = 13
-stats.Parent = mainFrame
-
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -10, 1, -120)
-scrollFrame.Position = UDim2.new(0, 5, 0, 70)
-scrollFrame.BackgroundTransparency = 1
-scrollFrame.ScrollBarThickness = 8
-scrollFrame.Parent = mainFrame
-
 local yOffset = 0
-local totalButtons = 0
-
-for _, funcData in ipairs(workingFunctions) do
-    local funcLabel = Instance.new("TextLabel")
-    funcLabel.Text = "🎯 " .. funcData.name
-    funcLabel.Size = UDim2.new(1, -10, 0, 25)
-    funcLabel.Position = UDim2.new(0, 5, 0, yOffset)
-    funcLabel.BackgroundTransparency = 1
-    funcLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
-    funcLabel.Font = Enum.Font.SourceSansBold
-    funcLabel.TextSize = 14
-    funcLabel.TextXAlignment = Enum.TextXAlignment.Left
-    funcLabel.Parent = scrollFrame
-    yOffset = yOffset + 30
+for _, category in ipairs(categories) do
+    local categoryFrame = Instance.new("Frame")
+    categoryFrame.Size = UDim2.new(1, 0, 0, 40)
+    categoryFrame.Position = UDim2.new(0, 0, 0, yOffset)
+    categoryFrame.BackgroundColor3 = category.color
+    categoryFrame.Parent = scrollFrame
     
-    for _, paramData in ipairs(funcData.params) do
-        local btn = Instance.new("TextButton")
-        btn.Text = "   ⚡ " .. paramData.name
-        btn.Size = UDim2.new(1, -20, 0, 35)
-        btn.Position = UDim2.new(0, 10, 0, yOffset)
-        btn.BackgroundColor3 = Color3.fromRGB(60, 70, 90)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.SourceSans
-        btn.TextSize = 12
-        btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.Parent = scrollFrame
+    local categoryTitle = Instance.new("TextLabel")
+    categoryTitle.Text = category.name
+    categoryTitle.Size = UDim2.new(1, -20, 1, 0)
+    categoryTitle.Position = UDim2.new(0, 10, 0, 0)
+    categoryTitle.BackgroundTransparency = 1
+    categoryTitle.TextColor3 = Color3.new(1, 1, 1)
+    categoryTitle.Font = Enum.Font.SourceSansBold
+    categoryTitle.TextSize = 18
+    categoryTitle.TextXAlignment = Enum.TextXAlignment.Left
+    categoryTitle.Parent = categoryFrame
+    
+    yOffset = yOffset + 45
+    
+    for _, effect in ipairs(category.effects) do
+        local effectFrame = Instance.new("Frame")
+        effectFrame.Size = UDim2.new(1, 0, 0, 70)
+        effectFrame.Position = UDim2.new(0, 0, 0, yOffset)
+        effectFrame.BackgroundColor3 = Color3.fromRGB(40, 45, 55)
+        effectFrame.Parent = scrollFrame
         
-        btn.MouseButton1Click:Connect(function()
-            local success, err = pcall(paramData.call)
-            if success then
-                print("✅ " .. funcData.name .. " (" .. paramData.name .. ") запущен")
-                btn.BackgroundColor3 = Color3.fromRGB(80, 150, 80)
-                task.wait(0.3)
-                btn.BackgroundColor3 = Color3.fromRGB(60, 70, 90)
-            else
-                print("❌ Ошибка: " .. tostring(err))
-                btn.BackgroundColor3 = Color3.fromRGB(150, 80, 80)
-                task.wait(0.3)
-                btn.BackgroundColor3 = Color3.fromRGB(60, 70, 90)
-            end
+        local icon = Instance.new("TextLabel")
+        icon.Text = "📋"
+        icon.Size = UDim2.new(0, 40, 0, 40)
+        icon.Position = UDim2.new(0, 10, 0.5, -20)
+        icon.AnchorPoint = Vector2.new(0, 0.5)
+        icon.BackgroundTransparency = 1
+        icon.TextColor3 = Color3.new(1, 1, 1)
+        icon.Font = Enum.Font.SourceSansBold
+        icon.TextSize = 24
+        icon.Parent = effectFrame
+        
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Text = effect.name
+        nameLabel.Size = UDim2.new(0.7, -60, 0, 30)
+        nameLabel.Position = UDim2.new(0, 60, 0, 10)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+        nameLabel.Font = Enum.Font.SourceSansBold
+        nameLabel.TextSize = 16
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.Parent = effectFrame
+        
+        local descLabel = Instance.new("TextLabel")
+        descLabel.Text = effect.desc
+        descLabel.Size = UDim2.new(0.7, -60, 0, 20)
+        descLabel.Position = UDim2.new(0, 60, 0, 40)
+        descLabel.BackgroundTransparency = 1
+        descLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+        descLabel.Font = Enum.Font.SourceSans
+        descLabel.TextSize = 12
+        descLabel.TextXAlignment = Enum.TextXAlignment.Left
+        descLabel.Parent = effectFrame
+        
+        local copyButton = Instance.new("TextButton")
+        copyButton.Text = "📋"
+        copyButton.Size = UDim2.new(0, 50, 0, 50)
+        copyButton.Position = UDim2.new(1, -60, 0.5, -25)
+        copyButton.AnchorPoint = Vector2.new(1, 0.5)
+        copyButton.BackgroundColor3 = Color3.fromRGB(70, 130, 200)
+        copyButton.TextColor3 = Color3.new(1, 1, 1)
+        copyButton.Font = Enum.Font.SourceSansBold
+        copyButton.TextSize = 20
+        copyButton.Parent = effectFrame
+        
+        copyButton.MouseButton1Click:Connect(function()
+            copyToClipboard(effect.code, effect.name)
         end)
         
-        yOffset = yOffset + 40
-        totalButtons = totalButtons + 1
+        yOffset = yOffset + 75
     end
     
     yOffset = yOffset + 10
@@ -204,161 +407,96 @@ end
 
 scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset)
 
-local bottomPanel = Instance.new("Frame")
-bottomPanel.Size = UDim2.new(1, 0, 0, 50)
-bottomPanel.Position = UDim2.new(0, 0, 1, 0)
-bottomPanel.BackgroundColor3 = Color3.fromRGB(40, 45, 60)
-bottomPanel.Parent = mainFrame
+local isVisible = true
+local originalPosition = mainContainer.Position
 
-local runAllBtn = Instance.new("TextButton")
-runAllBtn.Text = "🎆 ЗАПУСТИТЬ ВСЕ"
-runAllBtn.Size = UDim2.new(0.48, -5, 0, 35)
-runAllBtn.Position = UDim2.new(0, 5, 0.5, -17)
-runAllBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
-runAllBtn.TextColor3 = Color3.new(1, 1, 1)
-runAllBtn.Font = Enum.Font.SourceSansBold
-runAllBtn.TextSize = 14
-runAllBtn.Parent = bottomPanel
-
-runAllBtn.MouseButton1Click:Connect(function()
-    print("🚀 Запускаю все рабочие эффекты...")
-    
-    local count = 0
-    for _, funcData in ipairs(workingFunctions) do
-        for _, paramData in ipairs(funcData.params) do
-            local success = pcall(paramData.call)
-            if success then
-                count = count + 1
-                print("   " .. count .. ". " .. funcData.name .. " (" .. paramData.name .. ")")
-            end
-            task.wait(0.15)
-        end
-    end
-    
-    print("✅ Запущено " .. count .. " эффектов!")
-end)
-
-local copyBtn = Instance.new("TextButton")
-copyBtn.Text = "📋 ОТЧЕТ"
-copyBtn.Size = UDim2.new(0.48, -5, 0, 35)
-copyBtn.Position = UDim2.new(0.52, 0, 0.5, -17)
-copyBtn.BackgroundColor3 = Color3.fromRGB(180, 120, 80)
-copyBtn.TextColor3 = Color3.new(1, 1, 1)
-copyBtn.Font = Enum.Font.SourceSansBold
-copyBtn.TextSize = 14
-copyBtn.Parent = bottomPanel
-
-copyBtn.MouseButton1Click:Connect(function()
-    local report = "🎯 РЕАЛЬНЫЙ ОТЧЕТ EFFECTSMODULE\n"
-    report = report .. "📅 " .. os.date("%Y-%m-%d %H:%M:%S") .. "\n"
-    report = report .. "=========================================\n\n"
-    
-    report = report .. "✅ РАБОЧИЕ ФУНКЦИИ (15):\n"
-    for _, funcData in ipairs(workingFunctions) do
-        report = report .. "• " .. funcData.name .. ":\n"
-        for _, paramData in ipairs(funcData.params) do
-            report = report .. "  - " .. paramData.name .. "\n"
-        end
-    end
-    
-    report = report .. "\n❌ НЕ РАБОЧИЕ (15):\n"
-    report = report .. "• beameffect • bigparticleeffect • curveeffect\n"
-    report = report .. "• gravityparticle • groundLineDebris • groundhit\n"
-    report = report .. "• healthmessage • kbeffect • rudebustereffect\n"
-    report = report .. "• spawneffect • spawneffect2 • vergilglass\n"
-    report = report .. "• windeffect • ChangeSky • SpinPart\n"
-    
-    report = report .. "\n📊 СТАТИСТИКА:\n"
-    report = report .. "• Частиц создано: 165\n"
-    report = report .. "• Объектов создано: 0\n"
-    report = report .. "• Кнопок в GUI: " .. totalButtons .. "\n"
-    
-    print("\n📋 ОТЧЕТ ДЛЯ КОПИРОВАНИЯ:")
-    print(string.rep("=", 60))
-    print(report)
-    print(string.rep("=", 60))
-    
-    if toclipboard then
-        toclipboard(report)
-        print("\n✅ Отчет скопирован в буфер обмена!")
-    end
-end)
-
-local dragging = false
-local dragStart, startPos
-
-title.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
+hideButton.MouseButton1Click:Connect(function()
+    if isVisible then
+        mainContainer:TweenPosition(
+            UDim2.new(0.5, -200, 1, 50),
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Quad,
+            0.3,
+            true
         )
+        hideButton.Text = "⬆"
+    else
+        mainContainer:TweenPosition(
+            originalPosition,
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Quad,
+            0.3,
+            true
+        )
+        hideButton.Text = "⬇"
     end
+    isVisible = not isVisible
 end)
 
-game:GetService("UserInputService").InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
+local controlsFrame = Instance.new("Frame")
+controlsFrame.Size = UDim2.new(1, 0, 0, 40)
+controlsFrame.Position = UDim2.new(0, 0, 1, -40)
+controlsFrame.BackgroundColor3 = Color3.fromRGB(35, 40, 55)
+controlsFrame.Parent = mainContainer
+
+local copyAllButton = Instance.new("TextButton")
+copyAllButton.Text = "📂 КОПИРОВАТЬ ВСЕ"
+copyAllButton.Size = UDim2.new(0.5, -5, 1, -10)
+copyAllButton.Position = UDim2.new(0, 5, 0, 5)
+copyAllButton.BackgroundColor3 = Color3.fromRGB(80, 160, 80)
+copyAllButton.TextColor3 = Color3.new(1, 1, 1)
+copyAllButton.Font = Enum.Font.SourceSansBold
+copyAllButton.TextSize = 14
+copyAllButton.Parent = controlsFrame
+
+copyAllButton.MouseButton1Click:Connect(function()
+    local allScripts = "-- =============================================\n"
+    allScripts = allScripts .. "-- ВСЕ СКРИПТЫ ЭФФЕКТОВ\n"
+    allScripts = allScripts .. "-- Автоматически сгенерировано\n"
+    allScripts = allScripts .. "-- =============================================\n\n"
+    
+    for _, category in ipairs(categories) do
+        allScripts = allScripts .. "-- " .. string.upper(category.name) .. "\n"
+        allScripts = allScripts .. string.rep("-", 50) .. "\n\n"
+        
+        for _, effect in ipairs(category.effects) do
+            allScripts = allScripts .. "-- " .. effect.name .. "\n"
+            allScripts = allScripts .. "-- " .. effect.desc .. "\n"
+            allScripts = allScripts .. effect.code .. "\n\n"
+        end
     end
+    
+    copyToClipboard(allScripts, "ВСЕ СКРИПТЫ")
 end)
 
-task.wait(1)
+local closeButton = Instance.new("TextButton")
+closeButton.Text = "✕ ЗАКРЫТЬ"
+closeButton.Size = UDim2.new(0.5, -5, 1, -10)
+closeButton.Position = UDim2.new(0.5, 0, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 80, 80)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 14
+closeButton.Parent = controlsFrame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Text = "🎮 Готов к копированию! Всего эффектов: " .. #categories
+statusLabel.Size = UDim2.new(1, -20, 0, 25)
+statusLabel.Position = UDim2.new(0, 10, 0, 15)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextColor3 = Color3.fromRGB(200, 255, 200)
+statusLabel.Font = Enum.Font.SourceSans
+statusLabel.TextSize = 12
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+statusLabel.Parent = mainContainer
+
 print("\n" .. string.rep("=", 60))
-print("✅ FINAL EFFECTS GUI ЗАГРУЖЕН!")
-print("📊 15 рабочих функций с проверенными параметрами")
-print("🎯 Используйте кнопки в интерфейсе")
-print("📋 Нажмите 'ОТЧЕТ' для получения данных")
+print("📋 EFFECTS COPY GUI ЗАГРУЖЕН!")
+print("✨ Все эффекты распределены по категориям")
+print("📋 Нажмите на иконку 📋 чтобы скопировать скрипт")
+print("⬇  Нажмите на стрелку, чтобы скрыть/показать меню")
 print(string.rep("=", 60))
-
-local quickScript = [[-- =============================================
--- КВИК-СКРИПТ ДЛЯ ЗАПУСКА ЭФФЕКТОВ
--- Вставь в LocalScript и запусти
--- =============================================
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
-
-local EffectsModule = require(ReplicatedStorage:WaitForChild("EffectsModule"))
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-
-local quickEffects = {
-    function() EffectsModule.ImaginaryPurple() end,
-    function() EffectsModule.ImaginaryPurple(hrp.Position, 3) end,
-    function() EffectsModule.InstantSpawn(hrp.CFrame) end,
-    function() EffectsModule.circleparticleeffect() end,
-    function() EffectsModule.fireeffect(hrp.Position) end,
-    function() EffectsModule.groundDebris(hrp.Position) end,
-    function() EffectsModule.slasheffect(hrp.CFrame, Color3.new(1,0,0)) end,
-    function() EffectsModule.warning("test") end,
-}
-
-for i, effect in ipairs(quickEffects) do
-    pcall(effect)
-    task.wait(0.2)
-    print("✅ Эффект " .. i .. " запущен")
-end
-
-print("🎉 Все эффекты запущены!")]]
-
-print("\n⚡ КВИК-СКРИПТ ДЛЯ БЫСТРОГО ЗАПУСКА:")
-print(string.rep("-", 60))
-print(quickScript)
-print(string.rep("-", 60))
-
-if toclipboard then
-    toclipboard(quickScript)
-    print("📋 Квик-скрипт скопирован в буфер обмена!")
-end
